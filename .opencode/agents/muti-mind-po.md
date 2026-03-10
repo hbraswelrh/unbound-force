@@ -1,6 +1,6 @@
 ---
 description: "Muti-Mind AI Persona — Product Owner, Vision Keeper, and Prioritization Engine"
-mode: agent
+mode: subagent
 temperature: 0.2
 tools:
   read: true

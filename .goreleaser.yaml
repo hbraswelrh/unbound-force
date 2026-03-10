@@ -52,6 +52,14 @@ homebrew_casks:
     description: "Unbound Force specification framework toolkit"
     homepage: "https://github.com/unbound-force/unbound-force"
     directory: Casks
+    dependencies:
+      - cask: graphthulhu
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/unbound"]
+          end
     repository:
       owner: unbound-force
       name: homebrew-tap

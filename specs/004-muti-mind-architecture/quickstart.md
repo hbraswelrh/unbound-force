@@ -2,15 +2,40 @@
 
 ## Installation
 
-Muti-Mind operates as an OpenCode agent backed by a local CLI tool and requires the `graphthulhu` MCP server to be active.
+Muti-Mind operates as an OpenCode agent backed by a local CLI tool and
+requires the `graphthulhu` MCP server to be active.
 
-1. Ensure the `unbound` repo is initialized and `graphthulhu` MCP server is running.
-2. Ensure you have GitHub CLI (`gh`) authenticated if you intend to sync with GitHub Issues.
-3. In OpenCode, install the Muti-Mind persona and command wrappers:
+### Single-command install (recommended)
+
+```bash
+brew install unbound-force/tap/unbound
+```
+
+This installs both the `unbound` CLI and `graphthulhu` automatically.
+No separate download step needed.
+
+### Manual install
+
+If you manage tools outside Homebrew, install each binary separately:
+
+```bash
+# Install unbound
+brew install unbound-force/tap/unbound
+
+# Install graphthulhu (if not pulled automatically)
+brew install unbound-force/tap/graphthulhu
+```
+
+### Prerequisites
+
+1. Ensure GitHub CLI (`gh`) is authenticated if you intend to sync
+   with GitHub Issues:
    ```bash
-   # (Assuming future opencode plugin/agent install commands)
-   # Muti-Mind agents are located in .opencode/agents/muti-mind-po.md
+   gh auth login
    ```
+2. The Muti-Mind agent is located at `.opencode/agents/muti-mind-po.md`
+   and is activated automatically by OpenCode when working in a repo
+   scaffolded with `unbound init`.
 
 ## Initialization
 
