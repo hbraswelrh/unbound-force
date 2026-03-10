@@ -52,9 +52,9 @@ homebrew_casks:
     description: "Unbound Force specification framework toolkit"
     homepage: "https://github.com/unbound-force/unbound-force"
     directory: Casks
-    # skip_upload: GoReleaser writes the cask to dist/homebrew/Casks/unbound.rb
-    # but does not push to the tap. The sign-macos job in release.yml handles
-    # cloning the tap and patching Casks/unbound.rb with signed checksums.
+    # skip_upload: true — GoReleaser generates the cask to dist/ but does not
+    # push to the tap. The sign-macos job downloads it, patches darwin checksums
+    # with signed values, then pushes the complete cask to homebrew-tap.
     skip_upload: true
     dependencies:
       - cask: graphthulhu
@@ -64,3 +64,6 @@ homebrew_casks:
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/unbound"]
           end
+    repository:
+      owner: unbound-force
+      name: homebrew-tap
