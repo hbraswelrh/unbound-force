@@ -93,8 +93,21 @@ Implement tasks from an OpenSpec change.
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - If all done: prompt to commit, push, and
+     optionally create a PR before archiving
    - If paused: explain why and wait for guidance
+
+   **CRITICAL**: When all tasks are complete, remind
+   the user that changes must be committed and pushed
+   on the current `opsx/<name>` branch BEFORE
+   archiving. Do NOT suggest running `/opsx-archive`
+   until changes are committed and pushed. The
+   recommended completion flow is:
+   1. Commit all changes on `opsx/<name>`
+   2. Push to remote
+   3. Create PR (if desired)
+   4. Merge PR (if created)
+   5. Then archive with `/opsx-archive`
 
 **Output During Implementation**
 
@@ -124,7 +137,8 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete! Ready to archive this change.
+All tasks complete! Commit and push your changes, then
+archive with `/opsx-archive`.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -156,6 +170,7 @@ What would you like to do?
 - Update task checkbox immediately after completing each task
 - Pause on errors, blockers, or unclear requirements - don't guess
 - Use contextFiles from CLI output, don't assume specific file names
+- **NEVER switch branches or suggest archiving with uncommitted changes** -- all work must be committed and pushed on the current `opsx/<name>` branch before any branch switch occurs
 
 **Fluid Workflow Integration**
 

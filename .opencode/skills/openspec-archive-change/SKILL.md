@@ -65,7 +65,30 @@ Archive a completed change in the experimental workflow.
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
-5. **Perform the archive**
+5. **Commit and push all changes**
+
+   Before archiving or switching branches, ALL work on
+   the current branch MUST be committed and pushed.
+
+   a. Run `git status --short` to check for uncommitted
+      changes (staged, unstaged, or untracked files
+      related to this change).
+
+   b. **If uncommitted changes exist:**
+      - Stage and commit all relevant changes with a
+        descriptive commit message.
+      - Push to the remote branch.
+      - Verify `git status` is clean before proceeding.
+
+   c. **If the working tree is already clean:** proceed.
+
+   **CRITICAL**: Do NOT move to step 6 (archive) or
+   step 7 (branch switch) with uncommitted changes.
+   Switching branches with a dirty working tree causes
+   changes to follow you to the wrong branch or be
+   lost entirely.
+
+6. **Perform the archive**
 
    Create the archive directory if it doesn't exist:
    ```bash
@@ -82,9 +105,16 @@ Archive a completed change in the experimental workflow.
    mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
    ```
 
-6. **Return to main branch**
+7. **Return to main branch**
 
-   After the archive move completes:
+   After the archive move completes, commit the archive:
+   ```bash
+   git add openspec/changes/archive/
+   git commit -m "chore: archive openspec change <name>"
+   git push
+   ```
+
+   Then switch branches:
    ```bash
    git checkout main
    ```
@@ -93,7 +123,7 @@ Archive a completed change in the experimental workflow.
    in the summary that the developer can delete it
    manually with `git branch -d opsx/<name>` if desired.
 
-7. **Display summary**
+8. **Display summary**
 
    Show archive completion summary including:
    - Change name

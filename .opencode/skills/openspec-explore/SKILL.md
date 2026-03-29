@@ -283,6 +283,7 @@ But this summary is optional. Sometimes the thinking IS the value.
 - **Don't rush** - Discovery is thinking time, not task time
 - **Don't force structure** - Let patterns emerge naturally
 - **Don't auto-capture** - Offer to save insights, don't just do it
+- **Don't switch branches without confirmation** - If exploration leads to creating a proposal (which requires a new `opsx/` branch), check for uncommitted changes first and ask the user before switching. Never silently leave uncommitted work behind.
 - **Do visualize** - A good diagram is worth many paragraphs
 - **Do explore the codebase** - Ground discussions in reality
 - **Do question assumptions** - Including the user's and your own
