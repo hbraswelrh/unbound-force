@@ -178,6 +178,13 @@ org constitution — they MUST NOT contradict any org principle.
   pipeline (constitution → specify → clarify → plan → tasks →
   analyze → checklist → implement) to ensure requirements are
   captured before implementation begins.
+- **Cross-Repo Documentation**: When a change affects user-facing
+  behavior, hero capabilities, CLI commands, or workflows, a
+  GitHub issue MUST be created in the `unbound-force/website`
+  repository to track any required documentation or website
+  updates. The issue MUST be created before the implementing
+  PR is merged. Changes that are purely internal (refactoring,
+  test-only, CI-only) are exempt.
 
 ## Governance
 

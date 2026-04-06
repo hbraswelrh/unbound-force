@@ -352,6 +352,29 @@ Before marking any task complete, validate whether the change requires documenta
 
 A task is not complete until its documentation impact has been assessed and any necessary updates have been made.
 
+### Website Documentation Gate
+
+When a change affects user-facing behavior, hero capabilities, CLI commands, or workflows, a GitHub issue **MUST** be created in the `unbound-force/website` repository to track required documentation or website updates. The issue must be created before the implementing PR is merged.
+
+```bash
+gh issue create --repo unbound-force/website \
+  --title "docs: <brief description of what changed>" \
+  --body "<what changed, why it matters, which pages need updating>"
+```
+
+**Exempt changes** (no website issue needed):
+- Internal refactoring with no user-facing behavior change
+- Test-only changes
+- CI/CD pipeline changes
+- Spec artifacts (specs are internal planning documents)
+
+**Examples requiring a website issue**:
+- New CLI command or flag added
+- Hero capabilities changed (new agent, removed feature)
+- Installation steps changed (`uf setup` flow)
+- New convention pack added
+- Breaking changes to any user-facing workflow
+
 ### Spec Commit Gate
 
 All spec artifacts (`spec.md`, `plan.md`, `tasks.md`, and any other files under `specs/`) **must** be committed and pushed before implementation begins. Run `/speckit.implement` only after the spec commit is on the remote.
