@@ -6,6 +6,7 @@ description: >
   updating the OpenSpec CLI.
 ---
 <!-- scaffolded by uf vdev -->
+<!-- scaffolded by uf vdev -->
 <!-- scaffolded by uf vv0.6.1 -->
 
 # Command: /uf-init
@@ -358,3 +359,22 @@ modified (had at least one `✅` insertion):
 
 Finally, remind the user:
 > Run `git diff` to review all changes before committing.
+
+### Next Steps
+
+After customizations are applied:
+
+- Run `/cobalt-crush` to start implementing — it
+  auto-detects your active workflow (Speckit or OpenSpec)
+  and delegates to the correct implementation command.
+  Preferred over calling `/opsx-apply` directly.
+
+### When to Re-run
+
+Re-run `/uf-init` after:
+- Running `uf init` or `uf setup` (new tool versions
+  may reset third-party files)
+- Updating the OpenSpec CLI (`npm update`)
+- Upgrading the `uf` binary (`brew upgrade unbound-force`
+  — new versions may add scaffold files that need
+  customization)
