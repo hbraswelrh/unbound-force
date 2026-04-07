@@ -23,5 +23,23 @@ bin/
 # GoReleaser build output
 dist/
 
-# Workflow state, tool workspaces (orchestration engine)
-.uf/
+# Tool workspaces under .uf/ — track config, ignore runtime data
+# Orchestration runtime state
+.uf/workflows/
+.uf/artifacts/
+# Dewey runtime (index, cache, database)
+.uf/dewey/graph.db
+.uf/dewey/graph.db-shm
+.uf/dewey/graph.db-wal
+.uf/dewey/*.lock
+.uf/dewey/cache/
+.uf/dewey/dewey.log
+# Replicator runtime (database, logs)
+.uf/replicator/*.db
+.uf/replicator/*.db-shm
+.uf/replicator/*.db-wal
+.uf/replicator/*.lock
+# Muti-Mind runtime artifacts (not backlog)
+.uf/muti-mind/artifacts/
+# Mx F runtime metrics data
+.uf/mx-f/data/
