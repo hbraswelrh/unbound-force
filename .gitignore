@@ -23,6 +23,13 @@ bin/
 # GoReleaser build output
 dist/
 
+# Legacy tool directories (renamed to .uf/ in Spec 025)
+.dewey/
+.hive/
+.unbound-force/
+.muti-mind/
+.mx-f/
+
 # Tool workspaces under .uf/ — track config, ignore runtime data
 # Orchestration runtime state
 .uf/workflows/
