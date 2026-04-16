@@ -53,6 +53,45 @@ A phase boundary violation is treated as a process error.
 The agent MUST stop and report the violation rather than
 proceeding with out-of-phase changes.
 
+### CI Parity Gate
+
+Before marking any implementation task complete or
+declaring a PR ready, agents MUST replicate the CI checks
+locally. Read `.github/workflows/` to identify the exact
+commands CI runs, then execute those same commands. Any
+failure is a blocking error — a task is not complete
+until all CI-equivalent checks pass locally. Do not rely
+on a memorized list of commands; always derive them from
+the workflow files, which are the source of truth.
+
+### Review Council as PR Prerequisite
+
+Before submitting a pull request, agents **must** run
+`/review-council` and resolve all REQUEST CHANGES
+findings until all reviewers return APPROVE. There must
+be **minimal to no code changes** between the council's
+APPROVE verdict and the PR submission — the council
+reviews the final code, not a draft that changes
+afterward.
+
+Workflow:
+
+1. Complete all implementation tasks
+2. Run CI checks locally (build, test, vet)
+3. Run `/review-council` — fix any findings, re-run
+   until APPROVE
+4. Commit, push, and submit PR immediately after council
+   APPROVE
+5. Do NOT make further code changes between APPROVE and
+   PR submission
+
+Exempt from council review:
+
+- Constitution amendments (governance documents, not code)
+- Documentation-only changes (README, AGENTS.md, spec
+  artifacts)
+- Emergency hotfixes (must be retroactively reviewed)
+
 ## Constitution (Highest Authority)
 
 The org constitution at `.specify/memory/constitution.md` defines four core principles that govern all hero repositories:
@@ -308,6 +347,49 @@ All artifacts use the standard envelope format: `hero`, `version`, `timestamp`, 
 | `unbound-force/website` | Public website (Hugo + Doks) | v1.0.0 (Content Accuracy, Minimal Footprint, Visitor Clarity) | Active, 1 spec complete |
 | `unbound-force/dewey` | Semantic knowledge layer (MCP server) | N/A | Active |
 | `unbound-force/homebrew-tap` | Homebrew cask + formula distribution | N/A | Active |
+
+## Spec-First Development
+
+All changes that modify production code, test code, agent
+prompts, embedded assets, or CI configuration **must** be
+preceded by a spec workflow. The constitution
+(`.specify/memory/constitution.md`) is the highest-
+authority document in this project — all work must align
+with it.
+
+Two spec workflows are available:
+
+| Workflow | Location | Best For |
+|----------|----------|----------|
+| **Speckit** | `specs/NNN-name/` | Numbered feature specs with the full pipeline |
+| **OpenSpec** | `openspec/changes/name/` | Targeted changes with lightweight artifacts |
+
+**What requires a spec** (no exceptions without explicit
+user override):
+
+- New features or capabilities
+- Refactoring that changes function signatures, extracts
+  helpers, or moves code between packages
+- Test additions or assertion strengthening across
+  multiple functions
+- Agent prompt changes
+- CI workflow modifications
+- Data model changes (new struct fields, schema updates)
+
+**What is exempt** (may be done directly):
+
+- Constitution amendments (governed by the constitution's
+  own Governance section)
+- Typo corrections, comment-only changes, single-line
+  formatting fixes
+- Emergency hotfixes for critical production bugs (must
+  be retroactively documented)
+
+When an agent is unsure whether a change is trivial, it
+**must** ask the user rather than proceeding without a
+spec. The cost of an unnecessary spec is minutes; the
+cost of an unplanned change is rework, drift, and broken
+CI.
 
 ## Specification Framework
 
