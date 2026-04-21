@@ -4,6 +4,7 @@ description: >
   checks, rebase-merge, and return to main. One command
   to wrap up any feature or OpenSpec branch.
 ---
+<!-- scaffolded by uf vv0.12.0 -->
 <!-- scaffolded by uf vdev -->
 <!-- scaffolded by uf vdev -->
 

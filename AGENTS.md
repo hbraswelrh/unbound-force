@@ -76,6 +76,14 @@ Hero constitutions extend (never contradict) the org constitution. See the const
 
 All five heroes have implementations. Gaze has the most mature standalone implementation (Go CLI + static analysis engine). Muti-Mind has a backend CLI (`cmd/mutimind/`) and OpenCode agent. The Divisor has 5 review personas and convention packs (embedded in the `unbound-force` binary). Cobalt-Crush has a developer persona agent. Mx F has a full CLI backend (`cmd/mxf/`) with 7 subcommands and a coaching agent.
 
+### Utility Agents (Non-Hero)
+
+| Agent | Role | File | Status |
+|-------|------|------|--------|
+| Onboarding Guide | User profile capture and hero routing | `.opencode/agents/onboarding.md` | Implemented (Spec 031) |
+
+The onboarding agent is not a hero — it does not produce artifacts or participate in the hero lifecycle workflow. It captures user context (inspiration, interests, objectives) and routes users to existing heroes.
+
 ## Project Structure
 
 ```text
@@ -113,6 +121,7 @@ unbound-force/
 │   │   ├── divisor-envoy.md         # The Envoy: PR/communications (Divisor)
 │   │   ├── gaze-reporter.md         # Gaze report agent
 │   │   ├── muti-mind-po.md          # Muti-Mind Product Owner agent
+│   │   └── onboarding.md            # Onboarding interview agent (Spec 031)
 │   │   ├── reviewer-adversary.md    # Legacy reviewer (superseded by divisor-*)
 │   │   ├── reviewer-architect.md    # Legacy reviewer (superseded by divisor-*)
 │   │   ├── reviewer-guard.md        # Legacy reviewer (superseded by divisor-*)
@@ -128,6 +137,7 @@ unbound-force/
 │   │   ├── speckit.checklist.md
 │   │   ├── speckit.implement.md
 │   │   ├── speckit.taskstoissues.md
+│   │   ├── onboard.md               # /onboard onboarding interview (Spec 031)
 │   │   ├── review-council.md        # /review-council command (Divisor)
 │   │   ├── constitution-check.md    # /constitution-check command
 │   │   ├── unleash.md               # /unleash autonomous pipeline (Spec 018)
@@ -591,6 +601,34 @@ search only:
 - Use Grep for keyword search across the codebase
 - Use Glob for file pattern matching
 
+## User Profile
+
+If `.uf/onboarding/profile.md` exists, read it before
+starting your primary task. The profile contains the
+user's customization context captured during onboarding
+(`/onboard`). Use it to contextualize your decisions:
+
+- **Inspiration** section: Informs tone, values, and
+  quality bar. Align your output with what the user
+  considers "great."
+- **Interests** section: Informs domain focus, technology
+  preferences, and convention choices. Prioritize
+  patterns and tools the user cares about.
+- **Objectives** section: Informs priorities, timelines,
+  and focus areas. Weight your decisions toward the
+  user's stated goals.
+- **Hero Mapping** table: If this table contains entries
+  for your hero role, use them to contextualize your
+  specific priorities and focus areas.
+
+If the profile does not exist, proceed with your default
+behavior unchanged. Do not error or warn about a missing
+profile.
+
+If the profile has `status: draft` in its frontmatter,
+the profile is incomplete. You MAY use available
+dimensions but SHOULD note the profile is draft.
+
 ## Testing Conventions
 
 - **Framework**: Standard library `testing` package only. No testify, gomega, or other external assertion libraries.
@@ -704,9 +742,12 @@ This repo is primarily specifications and governance documents. Follow these con
 - N/A (no persistent state — container lifecycle is transient) (028-sandbox-command)
 - Go 1.24+ + `github.com/spf13/cobra` (CLI), `gopkg.in/yaml.v3` (config), `net/http` (Che REST API), `os/exec` (subprocess) (029-sandbox-cde-lifecycle)
 - Podman named volumes for persistent state, Eclipse Che / Dev Spaces for CDE workspaces (029-sandbox-cde-lifecycle)
+- Go 1.24+ (scaffold engine), + `embed.FS` (scaffold engine (031-agent-customization-onboarding)
+- Markdown files with YAML frontmatter a (031-agent-customization-onboarding)
 
 ## Recent Changes
 
+- 031-agent-customization-onboarding: Added onboarding interview agent (`onboarding.md`) and `/onboard` slash command (`onboard.md`) for capturing user inspiration, interests, and objectives into a structured profile at `.uf/onboarding/profile.md`. Profile uses YAML frontmatter (version, user, status, timestamps) + Markdown body (Inspiration, Interests, Objectives, Hero Mapping sections). Heroes automatically read the profile via a new "User Profile" section in AGENTS.md — no hero agent files modified. Added profile guidance injection step (Step 9) to `/uf-init` command following Spec 030 idempotent pattern. Agent includes: static hero capability map (5 heroes), three-phase interview flow, objective-to-hero routing (guardrail against agent duplication), update mode with profile history snapshots, edge case handling (abandoned interviews, contradictory inputs, missing heroes). Agent is user-owned (customizable interview flow); command is tool-owned (canonical invocation). Added 2 scaffold assets (33 → 35 files). Updated `expectedAssetPaths` and file count assertions. All 4 user stories and 39 tasks completed.
 - 029-sandbox-cde-lifecycle: Extended `internal/sandbox/` package with persistent workspace lifecycle (`create`/`destroy`) and CDE backend (Eclipse Che / Dev Spaces). Introduced `Backend` interface (Strategy pattern per SOLID Open/Closed) with two implementations: `PodmanBackend` (named volumes `uf-sandbox-<project>` for persistent state, per-project container names) and `CheBackend` (workspace provisioning via `chectl` CLI primary path with REST API fallback). Created 4 new source files: `backend.go` (interface + `ResolveBackend()` with resolution matrix: flag > env > config > auto-detect), `podman.go` (Create/Start/Stop/Destroy/Status/Attach with named volume lifecycle and partial failure cleanup), `che.go` (Create/Start/Stop/Destroy/Status/Attach via chectl or REST API with devfile-based provisioning), `workspace.go` (WorkspaceStatus, SandboxConfig with YAML parsing, DemoEndpoint, projectName sanitization, LoadConfig with env var overrides, FormatWorkspaceStatus, bidirectional git sync via setupGitSync/checkGitSync). Extended `Options` struct with `BackendName`, `WorkspaceName`, `DemoPorts`, `ConfigPath`, `CheURL`, `HTTPDo` fields (all zero-value defaults preserve Spec 028 behavior). Updated `sandbox.go` with `Create()` and `Destroy()` dispatch functions, persistent workspace detection in `Start()`/`Stop()`/`Extract()`, `WorkspaceStatusCheck()`. Updated `cmd/unbound-force/sandbox.go` with 2 new subcommands (`create` with `--backend`/`--demo-ports`/`--name` flags, `destroy` with `--yes`/`--force` and confirmation prompt), updated `start` with `--backend` flag, updated `stop`/`status` for persistent workspace support. Added 43 new test functions (82 total) covering backend resolution, PodmanBackend lifecycle, CheBackend chectl/REST paths, workspace helpers, config parsing, backward compatibility, git sync, demo endpoints. All existing Spec 028 tests pass (backward compatible). Go 1.24+ (CLI), `gopkg.in/yaml.v3` (config), `net/http` (Che REST API). All 4 user stories and 111 tasks completed.
 - opsx/workflow-phase-boundaries: Added workflow phase boundary enforcement (closes #92 + #94). Externalized 9 `speckit.*.md` command files from scaffold assets to `specify init` + `/uf-init` (embedded asset count 42 → 33). Added "Phase Discipline" MUST rule to constitution Development Workflow section. Added "Workflow Phase Boundaries" subsection to AGENTS.md Behavioral Constraints. Added `<!-- code-review: passed -->` marker to `/unleash` Step 6 (code review) with matching resumability detection in Step 2. Added 3 new sections to `/uf-init`: "Speckit Custom Commands" (creates 4 UF-custom commands: analyze, checklist, clarify, taskstoissues), "Speckit Command Guardrails" (injects `## Guardrails` into all 9 speckit commands), "Speckit UF Customizations" (verifies Dewey/constitution/review-council references). Deleted stray tool directories from `internal/scaffold/` and `cmd/unbound-force/` (~74 files). Added `.gitignore` patterns to prevent stray recurrence (`cmd/**/.opencode/`, `internal/**/.uf/`, etc.). Updated `expectedAssetPaths` (42 → 33), added 9 entries to `knownNonEmbeddedFiles`, updated file count assertion (42 → 33). Synchronized 2 scaffold asset copies (unleash.md, uf-init.md). No new Go logic -- Markdown + test assertion changes only. 27 tasks completed.
 - 028-sandbox-command: Added `uf sandbox` command with 5 subcommands (`start`, `stop`, `attach`, `extract`, `status`) for containerized OpenCode session management via Podman. Created new `internal/sandbox/` package (3 source files: `sandbox.go`, `detect.go`, `config.go`) following the established `Options`/`ExecCmd` injection pattern. `Start()` checks prerequisites (Podman, OpenCode), detects platform (macOS/Linux, SELinux), pulls image if needed, starts container with API key forwarding and resource limits, waits for health check with exponential backoff (500ms→5s, 60s timeout), and attaches TUI (or prints URL in `--detach` mode). `Extract()` generates patches via `git format-patch` inside container, displays summary, and applies via `git am` on confirmation. `Stop()` is idempotent. `Status()` parses `podman inspect` JSON. `Attach()` delegates to `opencode attach`. Two mount modes: isolated (read-only, default) and direct (read-write). SELinux `:Z` volume flag auto-detection on Linux. Dead container cleanup before start. Created `cmd/unbound-force/sandbox.go` with Cobra command registration (`--mode`, `--detach`, `--image`, `--memory`, `--cpus`, `--yes` flags). Added 39 test functions covering all public functions, error paths, platform detection, health check polling, and configuration builders. No persistent state -- container existence is the state. Go 1.24+ (CLI), `net/http` (health check), `os/exec` (subprocess). All 4 user stories and 87 tasks completed.

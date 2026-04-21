@@ -5,6 +5,7 @@ description: >
   arguments: detects active workflow and runs /speckit.implement or
   /opsx:apply.
 ---
+<!-- scaffolded by uf vv0.12.0 -->
 <!-- scaffolded by uf vdev -->
 <!-- scaffolded by uf vdev -->
 <!-- scaffolded by uf vv0.6.1 -->

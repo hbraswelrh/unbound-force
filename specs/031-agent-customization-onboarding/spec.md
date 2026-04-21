@@ -251,8 +251,10 @@ than suggesting new agent creation.
 
 ### Measurable Outcomes
 
-- **SC-001**: Users complete the onboarding interview
-  and produce a valid profile in under 10 minutes.
+- **SC-001**: The onboarding interview flow covers all
+  three dimensions in 15 or fewer agent exchanges
+  (questions + follow-ups) total, enabling users to
+  produce a valid profile in a single session.
 - **SC-002**: 100% of user-described objectives that
   match existing hero capabilities are correctly mapped
   to the corresponding hero during onboarding.
@@ -263,8 +265,8 @@ than suggesting new agent creation.
   onboarding process that duplicate existing hero
   functionality.
 - **SC-005**: Users can update any single dimension of
-  their profile in under 3 minutes without affecting
-  the other dimensions.
+  their profile in 5 or fewer agent exchanges without
+  affecting the other dimensions.
 - **SC-006**: Heroes operate identically to their
   default behavior when no user profile is present
   (zero regressions).

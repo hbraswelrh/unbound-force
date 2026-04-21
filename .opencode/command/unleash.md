@@ -6,6 +6,7 @@ description: >
   store learnings, and present demo instructions. Exits to
   the human only when it genuinely needs human judgment.
 ---
+<!-- scaffolded by uf vv0.12.0 -->
 <!-- scaffolded by uf vdev -->
 <!-- scaffolded by uf vdev -->
 
