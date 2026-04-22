@@ -109,6 +109,15 @@ assets match their canonical sources. No new Go
 business logic beyond scaffold registration -- the
 onboarding agent is a Markdown persona file.
 
+**Coverage ratchet**: The `expectedAssetPaths` assertion
+in `scaffold_test.go` serves as the coverage ratchet --
+the count MUST increase from 33 to 35 and MUST NOT
+decrease without explicit justification. The drift
+detection test (`TestEmbeddedAssets_MatchSource`) ensures
+100% sync between canonical and embedded copies.
+`isToolOwned` assertions verify file ownership
+classification (agent=user-owned, command=tool-owned).
+
 ## Project Structure
 
 ### Documentation (this feature)

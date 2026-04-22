@@ -45,9 +45,10 @@ populated.
    structured interview covering inspiration, interests,
    and objectives, and persists a user profile.
 2. **Given** the interview is in progress, **When** the
-   user provides vague or incomplete answers, **Then** the
-   agent asks targeted follow-up questions to elicit
-   actionable detail before moving to the next dimension.
+   user provides a short or generic answer (e.g., "I want
+   good code"), **Then** the agent asks at least one
+   follow-up question within the same dimension before
+   advancing to the next dimension.
 3. **Given** the interview is complete, **When** the user
    reviews the synthesized profile, **Then** they can
    confirm, edit, or restart any section before
@@ -89,13 +90,15 @@ test coverage).
 
 1. **Given** a completed user profile exists with
    security-focused objectives, **When** the Divisor
-   reviews code, **Then** the Divisor's review includes
-   heightened attention to security concerns as specified
-   in the profile.
+   reviews code, **Then** the Divisor's output
+   references the user profile context (e.g.,
+   acknowledges the security-focused objectives) and
+   applies them to its review scope.
 2. **Given** a completed user profile exists with
    performance-focused interests, **When** Muti-Mind
-   prioritizes the backlog, **Then** performance-related
-   items receive higher priority weight.
+   prioritizes the backlog, **Then** Muti-Mind's output
+   references the user profile context and factors the
+   stated interests into its prioritization rationale.
 3. **Given** no user profile exists, **When** any hero
    is invoked, **Then** it operates with its default
    behavior unchanged (backward compatible).
@@ -255,9 +258,13 @@ than suggesting new agent creation.
   three dimensions in 15 or fewer agent exchanges
   (questions + follow-ups) total, enabling users to
   produce a valid profile in a single session.
-- **SC-002**: 100% of user-described objectives that
-  match existing hero capabilities are correctly mapped
-  to the corresponding hero during onboarding.
+- **SC-002**: The onboarding agent MUST reference the
+  Hero Capability Reference table when processing
+  objectives. The static capability map MUST cover all
+  5 heroes with at least 2 example objectives each.
+  Objectives that match a table entry MUST route to
+  the corresponding hero rather than suggesting new
+  agent creation.
 - **SC-003**: All five heroes (Muti-Mind, Cobalt-Crush,
   Gaze, The Divisor, Mx F) reflect user profile context
   in their output when a profile exists.
@@ -330,3 +337,12 @@ than suggesting new agent creation.
 - Team-level aggregated profiles or organizational
   dashboards
 - Authentication or access control for user profiles
+
+### Future Considerations
+
+- **Profile schema validation test**: A Go test that
+  parses a sample profile against the contract rules
+  in `contracts/profile-schema.md` (YAML frontmatter
+  fields, body section structure) would catch schema
+  drift. Deferred from v1 because the profile is
+  produced by the AI agent, not by Go code.
