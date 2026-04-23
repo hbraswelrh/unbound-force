@@ -739,10 +739,11 @@ This repo is primarily specifications and governance documents. Follow these con
 
 ## Git & Workflow
 
-- **Commit format**: Conventional Commits -- `type: description` (e.g., `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`).
-- **Branching**: Feature branches required. No direct commits to `main` except trivial doc fixes.
-- **Code review**: Required before merge.
-- **Semantic versioning**: For releases and constitution amendments.
+Commit format, branching strategy, code review requirements,
+and semantic versioning rules are defined in the org
+constitution (`.specify/memory/constitution.md`, Development
+Workflow section). This repo follows all org-level rules
+without exception.
 
 ## Active Technologies
 - Go 1.24+ (unbound CLI binary, Cobra CLI framework, embed.FS scaffold)
