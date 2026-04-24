@@ -744,6 +744,8 @@ This repo is primarily specifications and governance documents. Follow these con
 - Podman named volumes for persistent state, Eclipse Che / Dev Spaces for CDE workspaces (029-sandbox-cde-lifecycle)
 - Go 1.24+ (scaffold engine), + `embed.FS` (scaffold engine (031-agent-customization-onboarding)
 - Markdown files with YAML frontmatter a (031-agent-customization-onboarding)
+- Markdown (agent file, command + OpenCode agent runtime, (032-pinkman-oss-scout)
+- Scouting results stored as Markdown files (032-pinkman-oss-scout)
 
 ## Recent Changes
 

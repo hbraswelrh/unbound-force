@@ -30,9 +30,9 @@ func TestRunInit_FreshDir(t *testing.T) {
 	}
 
 	// Verify the summary includes a non-trivial file count
-	// 35 = 33 prior + 2 onboarding files (Spec 031: onboarding.md agent + onboard.md command)
-	if !strings.Contains(output, "35 files processed") {
-		t.Errorf("expected '35 files processed' in output, got:\n%s", output)
+	// 37 = 35 prior + 2 Pinkman files (Spec 032: pinkman.md agent + scout.md command)
+	if !strings.Contains(output, "37 files processed") {
+		t.Errorf("expected '37 files processed' in output, got:\n%s", output)
 	}
 
 	// Verify a user-owned file was created
