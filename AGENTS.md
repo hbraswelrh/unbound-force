@@ -822,6 +822,8 @@ without exception.
 - Git repositories (`.github` org repo + per-repo `.github/settings.yml`) (032-org-gitops)
 - Go 1.24+ + `net/http`, `net/http/httputil` (stdlib), `github.com/spf13/cobra` (CLI), `github.com/charmbracelet/log` (logging) (033-gateway-command)
 - PID file at `.uf/gateway.pid` (plain text) (033-gateway-command)
+- Markdown (agent file, command + OpenCode agent runtime, (032-pinkman-oss-scout)
+- Scouting results stored as Markdown files (032-pinkman-oss-scout)
 
 ## Recent Changes
 

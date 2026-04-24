@@ -122,18 +122,20 @@ func mapAssetToSource(relPath string) string {
 // expectedAssetPaths is the canonical list of embedded assets.
 // Update this list when adding or removing assets.
 var expectedAssetPaths = []string{
-	// OpenCode commands (7) — UF-custom only; speckit.*.md externalized to specify init + /uf-init
+	// OpenCode commands (8) — UF-custom only; speckit.*.md externalized to specify init + /uf-init
 	"opencode/command/agent-brief.md",
 	"opencode/command/cobalt-crush.md",
 	"opencode/command/constitution-check.md",
 	"opencode/command/finale.md",
 	"opencode/command/review-council.md",
+	"opencode/command/scout.md",
 	"opencode/command/uf-init.md",
 	"opencode/command/unleash.md",
-	// OpenCode agents — Divisor personas (6) + Cobalt-Crush (1) + Mx F coach (1) + constitution-check (1)
+	// OpenCode agents — Divisor personas (6) + Cobalt-Crush (1) + Mx F coach (1) + constitution-check (1) + pinkman (1)
 	"opencode/agents/cobalt-crush-dev.md",
 	"opencode/agents/constitution-check.md",
 	"opencode/agents/mx-f-coach.md", // Spec 007: Mx F coaching persona (user-owned, not in --divisor subset, not tool-owned)
+	"opencode/agents/pinkman.md",     // Spec 032: Pinkman OSS Scout (user-owned)
 	"opencode/agents/divisor-adversary.md",
 	"opencode/agents/divisor-architect.md",
 	"opencode/agents/divisor-curator.md",
