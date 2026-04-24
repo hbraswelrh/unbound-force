@@ -8,10 +8,11 @@ defines a `Config` struct covering seven sections: `setup`,
 `workflow`.
 
 The package MUST provide a `Load(opts LoadOptions) (*Config,
-error)` function that implements 4-layer resolution: user
-config, repo config, environment variable overrides, and
-compiled defaults. CLI flag overrides are applied by the
-caller at the cmd layer.
+error)` function that implements 4-layer resolution: compiled
+defaults, user config, repo config, and environment variable
+overrides. CLI flag overrides are applied by the caller at
+the cmd layer, making the full system resolution 5 layers
+(per design D3).
 
 The package MUST provide injectable function fields on the
 `LoadOptions` struct (`ReadFile`, `Getenv`, `UserConfigDir`)
@@ -70,6 +71,10 @@ The system MUST provide a `uf config init` command that
 creates `.uf/config.yaml` with all sections and fields
 present as YAML comments.
 
+When a `.uf/config.yaml` already exists, the command SHOULD
+create a backup at `.uf/config.yaml.bak` before modifying
+the file.
+
 When a `.uf/config.yaml` already exists, the command MUST:
 - Preserve all uncommented (user-set) values
 - Add sections present in the current-version template but
@@ -80,6 +85,11 @@ When a `.uf/config.yaml` already exists, the command MUST:
 
 The command MUST NOT overwrite uncommented values without
 explicit user confirmation.
+
+Files created by `uf config init` MUST be written with 0o644
+permissions. Sensitive credentials (tokens, API keys) SHOULD
+be provided via environment variables rather than persisted in
+config files.
 
 #### Scenario: First-time config init
 

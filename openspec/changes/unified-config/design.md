@@ -236,6 +236,11 @@ Not all config fields need env var overrides. Fields like
 complex enough that env var representation would be awkward.
 These are config-file-only settings.
 
+**Sensitive credentials** (e.g., `UF_CHE_TOKEN`) SHOULD be
+provided exclusively via environment variables and MUST NOT
+be persisted in config files. `uf config show` MUST redact
+any field marked as sensitive.
+
 ### D11: Agent model frontmatter cleanup
 
 Remove `model: google-vertex-anthropic/claude-opus-4-6@default`
@@ -256,7 +261,7 @@ config avoids duplication.
 ### R1: YAML comment-preserving merge is complex
 
 The `uf config init` update algorithm (D6) requires AST-level
-YAML manipulation. `gopkg.in/yaml.v3`'s Node API supports this
+YAML manipulation. `goccy/go-yaml`'s `ast.Node` API supports this
 but the code will be non-trivial (~150-200 lines). Incorrect
 implementation could corrupt user config files.
 

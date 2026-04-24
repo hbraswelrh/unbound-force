@@ -837,12 +837,13 @@ func TestDoctorRun(t *testing.T) {
 		t.Log("Run returned nil error (all checks passed or only warnings)")
 	}
 
-	// Verify 8 groups in correct order.
+	// Verify 9 groups in correct order.
 	expectedGroups := []string{
 		"Detected Environment",
 		"Core Tools",
 		"Replicator",
 		"Dewey Knowledge Layer",
+		"Configuration",
 		"Scaffolded Files",
 		"Hero Availability",
 		"MCP Server Config",
@@ -1000,8 +1001,8 @@ func TestDoctorRun_NonGitDir(t *testing.T) {
 	}
 
 	// All checks should still execute.
-	if len(report.Groups) != 8 {
-		t.Errorf("expected 8 groups, got %d", len(report.Groups))
+	if len(report.Groups) != 9 {
+		t.Errorf("expected 9 groups, got %d", len(report.Groups))
 	}
 }
 

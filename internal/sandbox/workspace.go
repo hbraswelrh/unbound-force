@@ -3,10 +3,12 @@ package sandbox
 import (
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/unbound-force/unbound-force/internal/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -167,6 +169,11 @@ func volumeNameForProject(dir string) string {
 // Returns a zero-value SandboxConfig with defaults if the
 // file does not exist. Environment variables override
 // config file values.
+//
+// When .uf/config.yaml exists and contains a non-default
+// sandbox section, those values take precedence over
+// .uf/sandbox.yaml. A deprecation warning is printed to
+// stderr when .uf/sandbox.yaml is still present.
 func LoadConfig(opts Options) (SandboxConfig, error) {
 	configPath := opts.ConfigPath
 	if configPath == "" {
@@ -174,15 +181,49 @@ func LoadConfig(opts Options) (SandboxConfig, error) {
 	}
 
 	var cfg SandboxConfig
+	legacyExists := false
 
 	data, err := opts.ReadFile(configPath)
-	if err != nil {
-		// Config file missing — return defaults (not an error).
-		return cfg, nil
+	if err == nil {
+		legacyExists = true
+		if parseErr := yaml.Unmarshal(data, &cfg); parseErr != nil {
+			return cfg, fmt.Errorf("parse %s: %w", configPath, parseErr)
+		}
 	}
 
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return cfg, fmt.Errorf("parse %s: %w", configPath, err)
+	// Check unified config (.uf/config.yaml) for sandbox section.
+	// Non-default values from unified config override legacy values.
+	unifiedPath := filepath.Join(opts.ProjectDir, ".uf", "config.yaml")
+	if _, statErr := os.Stat(unifiedPath); statErr == nil {
+		readFile := opts.ReadFile
+		if readFile == nil {
+			readFile = os.ReadFile
+		}
+		ucfg, loadErr := config.Load(config.LoadOptions{
+			ProjectDir: opts.ProjectDir,
+			ReadFile:   readFile,
+		})
+		if loadErr == nil && ucfg != nil && !ucfg.Sandbox.IsEmpty() {
+			// Apply non-default unified config values.
+			if ucfg.Sandbox.Backend != "" && ucfg.Sandbox.Backend != "auto" {
+				cfg.Backend = ucfg.Sandbox.Backend
+			}
+			if ucfg.Sandbox.Che.URL != "" {
+				cfg.Che.URL = ucfg.Sandbox.Che.URL
+			}
+			if ucfg.Sandbox.Che.Token != "" {
+				cfg.Che.Token = ucfg.Sandbox.Che.Token
+			}
+			if ucfg.Sandbox.DemoPorts != nil {
+				cfg.DemoPorts = ucfg.Sandbox.DemoPorts
+			}
+		}
+	}
+
+	// Print deprecation warning when legacy file exists.
+	if legacyExists {
+		fmt.Fprintf(os.Stderr,
+			"Warning: .uf/sandbox.yaml is deprecated. Run 'uf config init' to migrate to .uf/config.yaml\n")
 	}
 
 	// Environment variable overrides.

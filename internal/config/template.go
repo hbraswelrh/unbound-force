@@ -1,20 +1,21 @@
-# .uf/config.yaml
-# Workflow configuration for Unbound Force hero lifecycle.
-# CLI flags (--define-mode, --spec-review) override these defaults.
+// SPDX-License-Identifier: Apache-2.0
 
-# workflow:
-#   execution_modes:
-#     define: swarm      # "human" (default) or "swarm"
-#     implement: swarm   # default: swarm
-#     validate: swarm    # default: swarm
-#     review: swarm      # default: swarm
-#     accept: human      # default: human
-#     reflect: swarm     # default: swarm
-#   spec_review: false   # enable spec review checkpoint (default: false)
+package config
 
+// Template returns the full commented-out YAML template for the
+// current config version. All 7 sections are present with inline
+// comments documenting valid values and defaults.
+func Template() string {
+	return `# .uf/config.yaml
+# Unbound Force project configuration.
+# All values shown are defaults — only uncomment what you want to change.
+# CLI flags and environment variables override these settings.
+# Env var overrides: UF_PACKAGE_MANAGER, OLLAMA_MODEL, OLLAMA_HOST,
+#   UF_SANDBOX_IMAGE, UF_SANDBOX_BACKEND, UF_SANDBOX_RUNTIME,
+#   UF_CHE_URL, UF_CHE_TOKEN, UF_GATEWAY_PORT, UF_GATEWAY_PROVIDER
 
 # ─── Setup Preferences ───────────────────────────────────────
-# Controls how `uf setup` installs tools.
+# Controls how ` + "`uf setup`" + ` installs tools.
 # setup:
 #   package_manager: auto        # auto | homebrew | dnf | apt | manual
 #   skip: []                     # tool names to skip: [ollama, dewey, ...]
@@ -35,12 +36,10 @@
 #     replicator:
 #       method: auto             # auto | homebrew | skip
 
-
 # ─── Scaffold Preferences ────────────────────────────────────
-# Controls what `uf init` deploys.
+# Controls what ` + "`uf init`" + ` deploys.
 # scaffold:
 #   language: auto               # auto | go | typescript | python | rust
-
 
 # ─── Embedding ────────────────────────────────────────────────
 # Controls the embedding model used by Dewey.
@@ -50,9 +49,8 @@
 #   provider: ollama             # ollama (only supported today)
 #   host: http://localhost:11434
 
-
 # ─── Sandbox ──────────────────────────────────────────────────
-# Controls `uf sandbox` behavior.
+# Controls ` + "`uf sandbox`" + ` behavior.
 # sandbox:
 #   runtime: auto                # auto | podman | docker
 #   backend: auto                # auto | podman | che
@@ -66,17 +64,42 @@
 #     token: ""
 #   demo_ports: []
 
-
 # ─── Gateway ──────────────────────────────────────────────────
-# Controls `uf gateway` behavior.
+# Controls ` + "`uf gateway`" + ` behavior.
 # gateway:
 #   port: 53147
 #   provider: auto               # auto | anthropic | vertex | bedrock
 
-
 # ─── Doctor ───────────────────────────────────────────────────
-# Controls `uf doctor` check behavior.
+# Controls ` + "`uf doctor`" + ` check behavior.
 # doctor:
 #   skip: []                     # check names to skip
 #   tools:                       # override tool severity
 #     gaze: recommended          # required | recommended | optional
+
+# ─── Workflow ─────────────────────────────────────────────────
+# Controls hero lifecycle workflow.
+# workflow:
+#   execution_modes:
+#     define: human               # human | swarm
+#     implement: swarm
+#     validate: swarm
+#     review: swarm
+#     accept: human
+#     reflect: swarm
+#   spec_review: false
+`
+}
+
+// knownSections lists the top-level section names in the current
+// config template. Used by InitFile to detect added/removed
+// sections.
+var knownSections = []string{
+	"setup",
+	"scaffold",
+	"embedding",
+	"sandbox",
+	"gateway",
+	"doctor",
+	"workflow",
+}

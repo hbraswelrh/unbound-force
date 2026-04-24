@@ -1,3 +1,9 @@
+---
+status: draft
+branch: opsx/unified-config
+date: 2026-04-23
+---
+
 ## Why
 
 The Unbound Force CLI (`uf`) makes opinionated decisions about package
@@ -140,6 +146,24 @@ not require UF-level configuration.
   current behavior and precedence.
 - Existing `workflow:` section in `.uf/config.yaml` (if manually
   created) is preserved -- it becomes one section among seven.
+
+## Documentation Impact
+
+This change introduces 3 new CLI commands and modifies 5
+existing commands. The following documentation updates are
+required:
+
+- **AGENTS.md**: Update Project Structure (add `internal/config/`,
+  `cmd/unbound-force/config.go`), Active Technologies, and
+  Recent Changes. Covered by tasks 11.1-11.3.
+- **Website**: A documentation issue MUST be filed in
+  `unbound-force/website` covering the `uf config` command
+  group, layered resolution model, and CI/CD configuration
+  patterns. To be filed during implementation.
+- **Blog opportunity**: The unified config feature reduces
+  config surfaces and enables CI/CD patterns — suitable for
+  a blog post. Issue to be filed when the feature is closer
+  to completion.
 
 ## Constitution Alignment
 

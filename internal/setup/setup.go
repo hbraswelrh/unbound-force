@@ -16,6 +16,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/unbound-force/unbound-force/internal/config"
 	"github.com/unbound-force/unbound-force/internal/doctor"
 )
 
@@ -66,6 +67,24 @@ type Options struct {
 	// used to construct GitHub Release RPM URLs. Set by the CLI
 	// from the build-time version variable.
 	Version string
+
+	// PackageManager is the preferred package manager from config.
+	// Valid: "auto", "homebrew", "dnf", "apt", "manual".
+	PackageManager string
+
+	// SkipTools lists tool names to skip during setup.
+	SkipTools []string
+
+	// ToolMethods provides per-tool install method overrides from config.
+	ToolMethods map[string]config.ToolConfig
+
+	// EmbeddingModel is the embedding model name from config.
+	// Defaults to "granite-embedding:30m".
+	EmbeddingModel string
+
+	// EmbeddingDimensions is the embedding vector dimension from config.
+	// Defaults to 256.
+	EmbeddingDimensions int
 }
 
 // defaults fills zero-value fields with production implementations.
@@ -118,14 +137,53 @@ type stepResult struct {
 	err    error
 }
 
-// graniteModel is the enterprise-grade embedding model used by both
-// Dewey and Replicator. IBM Granite, Apache 2.0, permissibly licensed
-// training data. Setting these env vars aligns all tools
-// with the same embedding model.
+// Default embedding model constants — used when config does not
+// override. IBM Granite, Apache 2.0, permissibly licensed training data.
 const (
-	graniteModel    = "granite-embedding:30m"
-	graniteEmbedDim = "256"
+	defaultEmbeddingModel = "granite-embedding:30m"
+	defaultEmbeddingDim   = "256"
 )
+
+// embeddingModel returns the configured or default embedding model name.
+func (o *Options) embeddingModel() string {
+	if o.EmbeddingModel != "" {
+		return o.EmbeddingModel
+	}
+	return defaultEmbeddingModel
+}
+
+// embeddingDim returns the configured or default embedding dimension as a string.
+func (o *Options) embeddingDim() string {
+	if o.EmbeddingDimensions > 0 {
+		return strconv.Itoa(o.EmbeddingDimensions)
+	}
+	return defaultEmbeddingDim
+}
+
+// shouldSkipTool returns true if the tool should be skipped
+// based on the config skip list or per-tool method override.
+func (o *Options) shouldSkipTool(toolName string) bool {
+	for _, s := range o.SkipTools {
+		if s == toolName {
+			return true
+		}
+	}
+	if o.ToolMethods != nil {
+		if tc, ok := o.ToolMethods[toolName]; ok && tc.Method == "skip" {
+			return true
+		}
+	}
+	if o.PackageManager == "manual" {
+		// In manual mode, skip tools with auto method (no per-tool override).
+		if o.ToolMethods == nil {
+			return true
+		}
+		if tc, ok := o.ToolMethods[toolName]; !ok || tc.Method == "" || tc.Method == "auto" {
+			return true
+		}
+	}
+	return false
+}
 
 // Run executes the full setup workflow per FR-021/030/032/034/035.
 func Run(opts Options) error {
@@ -137,10 +195,11 @@ func Run(opts Options) error {
 	}
 
 	// Set Ollama env vars so all embedding consumers use the same
-	// enterprise-grade embedding model. These are inherited by
-	// child processes (replicator setup, dewey serve).
-	_ = os.Setenv("OLLAMA_MODEL", graniteModel)
-	_ = os.Setenv("OLLAMA_EMBED_DIM", graniteEmbedDim)
+	// embedding model. These are inherited by child processes
+	// (replicator setup, dewey serve). Values come from config
+	// or compiled defaults.
+	_ = os.Setenv("OLLAMA_MODEL", opts.embeddingModel())
+	_ = os.Setenv("OLLAMA_EMBED_DIM", opts.embeddingDim())
 
 	// Detect environment (reuse from doctor package).
 	doctorOpts := &doctor.Options{
@@ -182,11 +241,19 @@ func Run(opts Options) error {
 
 	// Step 1: Install OpenCode (FR-022).
 	fmt.Fprintf(opts.Stdout, "  [1/14] OpenCode...\n")
-	results = append(results, installOpenCode(&opts, env))
+	if opts.shouldSkipTool("opencode") {
+		results = append(results, stepResult{name: "OpenCode", action: "skipped", detail: "excluded by config"})
+	} else {
+		results = append(results, installOpenCode(&opts, env))
+	}
 
 	// Step 2: Install Gaze (FR-023).
 	fmt.Fprintf(opts.Stdout, "  [2/14] Gaze...\n")
-	results = append(results, installGaze(&opts, env))
+	if opts.shouldSkipTool("gaze") {
+		results = append(results, stepResult{name: "Gaze", action: "skipped", detail: "excluded by config"})
+	} else {
+		results = append(results, installGaze(&opts, env))
+	}
 
 	// Step 3: Install Mx F Manager hero.
 	fmt.Fprintf(opts.Stdout, "  [3/14] Mx F...\n")
@@ -283,10 +350,10 @@ func Run(opts Options) error {
 
 	// Embedding model alignment note.
 	fmt.Fprintln(opts.Stdout)
-	fmt.Fprintln(opts.Stdout, "Note: Replicator and Dewey are configured to use "+graniteModel+".")
+	fmt.Fprintln(opts.Stdout, "Note: Replicator and Dewey are configured to use "+opts.embeddingModel()+".")
 	fmt.Fprintln(opts.Stdout, "  Add to your shell profile for consistent behavior:")
-	fmt.Fprintln(opts.Stdout, "  export OLLAMA_MODEL="+graniteModel)
-	fmt.Fprintln(opts.Stdout, "  export OLLAMA_EMBED_DIM="+graniteEmbedDim)
+	fmt.Fprintln(opts.Stdout, "  export OLLAMA_MODEL="+opts.embeddingModel())
+	fmt.Fprintln(opts.Stdout, "  export OLLAMA_EMBED_DIM="+opts.embeddingDim())
 
 	return nil
 }
@@ -821,7 +888,7 @@ func installDewey(opts *Options, env doctor.DetectedEnvironment) stepResult {
 	// After installing, pull the embedding model.
 	modelResult := pullEmbeddingModel(opts)
 	if modelResult.action == "failed" {
-		return stepResult{name: "Dewey", action: "installed", detail: "via Homebrew (model pull failed — run 'ollama serve' then 'ollama pull " + graniteModel + "')"}
+		return stepResult{name: "Dewey", action: "installed", detail: "via Homebrew (model pull failed — run 'ollama serve' then 'ollama pull " + opts.embeddingModel() + "')"}
 	}
 
 	return stepResult{name: "Dewey", action: "installed", detail: "via Homebrew"}
@@ -836,7 +903,7 @@ func pullEmbeddingModel(opts *Options) stepResult {
 	}
 
 	if opts.DryRun {
-		return stepResult{name: "Dewey", action: "dry-run", detail: "Would run: ollama pull " + graniteModel}
+		return stepResult{name: "Dewey", action: "dry-run", detail: "Would run: ollama pull " + opts.embeddingModel()}
 	}
 
 	// Check if model is already pulled.
@@ -845,11 +912,11 @@ func pullEmbeddingModel(opts *Options) stepResult {
 		return stepResult{name: "Dewey", action: "already installed", detail: "embedding model ready"}
 	}
 
-	if _, err := opts.ExecCmd("ollama", "pull", graniteModel); err != nil {
+	if _, err := opts.ExecCmd("ollama", "pull", opts.embeddingModel()); err != nil {
 		return stepResult{
 			name:   "Dewey",
 			action: "failed",
-			detail: "ollama pull failed — ensure the Ollama server is running (ollama serve), then run: ollama pull " + graniteModel,
+			detail: "ollama pull failed — ensure the Ollama server is running (ollama serve), then run: ollama pull " + opts.embeddingModel(),
 			err:    err,
 		}
 	}

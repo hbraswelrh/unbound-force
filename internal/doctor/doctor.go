@@ -56,6 +56,18 @@ type Options struct {
 	// URL is derived from OLLAMA_HOST env var (default:
 	// http://localhost:11434).
 	EmbedCheck func(model string) error
+
+	// SkipChecks lists check group names to skip entirely.
+	// Populated from config.Doctor.Skip. Empty means run all.
+	SkipChecks []string
+
+	// ToolSeverities maps tool names to severity overrides.
+	// Populated from config.Doctor.Tools.
+	ToolSeverities map[string]string
+
+	// EmbeddingModel is the embedding model name from config.
+	// Used instead of the compiled default when non-empty.
+	EmbeddingModel string
 }
 
 // defaults fills zero-value fields with production implementations.
@@ -123,6 +135,7 @@ func Run(opts Options) (*Report, error) {
 		checkCoreTools(&opts, env),
 		checkReplicator(&opts),
 		checkDewey(&opts),
+		checkConfiguration(&opts),
 		checkScaffoldedFiles(&opts),
 		checkHeroAvailability(&opts),
 		checkMCPConfig(&opts),
