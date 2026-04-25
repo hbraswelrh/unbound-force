@@ -78,12 +78,18 @@ When the OSI website is unreachable, use this hardcoded
 set of well-known OSI-approved licenses (all have been
 on the OSI list for 10+ years):
 
+**Permissive**:
 MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC,
-MPL-2.0, LGPL-2.1-only, LGPL-2.1-or-later,
-LGPL-3.0-only, LGPL-3.0-or-later, GPL-2.0-only,
-GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later,
-AGPL-3.0-only, AGPL-3.0-or-later, Unlicense,
-Artistic-2.0, EPL-2.0, EUPL-1.2, 0BSD, Zlib, BSL-1.0
+Unlicense, 0BSD, Zlib, BSL-1.0
+
+**Weak-copyleft**:
+LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only,
+LGPL-3.0-or-later, MPL-2.0, EPL-2.0, EUPL-1.2,
+Artistic-2.0
+
+**Strong-copyleft**:
+GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only,
+GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later
 
 When using this fallback, always include a notice in
 the results header:
@@ -120,6 +126,13 @@ For each project, classify its license:
      option against the OSI list and report the most
      favorable approved option
 
+5. **Compatibility tier**: After assigning the OSI
+   verdict, assign a compatibility tier from the
+   License Compatibility table below.
+6. **Compatibility verdict**: Produce a compatibility
+   verdict based on the tier (see License
+   Compatibility section).
+
 **Edge cases**:
 - Dual-license (FR-011): Evaluate each option. If at
   least one is OSI-approved, classify as `dual_approved`
@@ -127,6 +140,73 @@ For each project, classify its license:
 - SPDX expression with "OR": Treat as dual-license.
 - SPDX expression with "AND": Both must be approved for
   the project to be classified as `approved`.
+
+## License Compatibility
+
+The Unbound Force ecosystem uses Apache-2.0. Classify
+each detected license into a compatibility tier based
+on its derivative work obligations:
+
+### Compatibility Tier Table
+
+| Tier | Licenses | Obligation |
+|------|----------|------------|
+| `permissive` | MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense, 0BSD, Zlib, BSL-1.0 | None or minimal — attribution only |
+| `weak-copyleft` | LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later, MPL-2.0, EPL-2.0, EUPL-1.2, Artistic-2.0 | File-level or linking-exception — modifications to the library must be shared, but the consuming project is not a derivative work if linked as a library |
+| `strong-copyleft` | GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later | Full — any derivative work must be distributed under the same license |
+| `unknown` | Any license not in the above tiers | Unclassified — requires human review |
+
+### Compatibility Verdict
+
+Based on the tier, produce a compatibility verdict
+relative to Apache-2.0:
+
+| Tier | Verdict | Rationale |
+|------|---------|-----------|
+| `permissive` | `compatible` | No derivative work conflicts with Apache-2.0 |
+| `weak-copyleft` | `caution` | May be compatible depending on usage (linking vs modification). Requires legal review |
+| `strong-copyleft` | `incompatible` | Derivative work obligations cannot be satisfied under Apache-2.0 |
+| `unknown` | `caution` | Unclassified — requires human review |
+
+For non-OSI licenses (`not_approved` verdict), the
+compatibility verdict is `incompatible`.
+
+For non-standard licenses (`manual_review` verdict),
+the compatibility verdict is `caution`.
+
+### Dual-License Compatibility
+
+For dual-licensed projects (SPDX `OR` expression),
+evaluate each license option independently and use
+the most favorable (least restrictive) compatibility
+tier.
+
+Tier ordering from most to least favorable:
+`permissive` > `weak-copyleft` > `strong-copyleft`
+> `unknown`.
+
+Examples:
+- `MIT OR GPL-3.0` → `permissive` / `compatible`
+- `LGPL-3.0 OR GPL-3.0` → `weak-copyleft` / `caution`
+- `GPL-3.0 OR AGPL-3.0` → `strong-copyleft` /
+  `incompatible`
+
+### Compatibility-Gated Recommendation
+
+The compatibility verdict acts as a hard gate on the
+recommendation verdict:
+
+| Compatibility | Maximum recommendation |
+|---------------|-----------------------|
+| `compatible` | `adopt` |
+| `caution` | `evaluate` |
+| `incompatible` | `avoid` |
+
+A `compatible` license does not guarantee `adopt` —
+other factors (maintenance health, trend trajectory)
+still apply. But an `incompatible` license overrides
+all positive signals. The `caution` tier caps at
+`evaluate` to flag the need for human legal review.
 
 ## Output Formatting
 
@@ -143,6 +223,7 @@ For each project, classify its license:
 #### 1. <project-name>
 - **URL**: <repository-url>
 - **License**: <spdx-id> (OSI-approved)
+- **Compatibility**: <tier> (<verdict>)
 - **Language**: <primary-language>
 - **Stars**: N (↑X% in 90d)
 - **Releases**: N in 6mo
@@ -174,10 +255,10 @@ For each project, classify its license:
 ## Dependency Audit: <manifest-path>
 **Date**: YYYY-MM-DD | **Dependencies**: N total
 
-| Dependency | Current | Latest | Update? | License Changed? | Risk     |
-|------------|---------|--------|---------|------------------|----------|
-| dep-a      | v1.2.0  | v1.3.0 | Yes     | No               | healthy  |
-| dep-b      | v2.0.0  | v3.0.0 | Yes     | Yes (MIT→GPL-3.0)| critical |
+| Dependency | Current | Latest | Update? | License Changed? | Compatibility | Risk     |
+|------------|---------|--------|---------|------------------|---------------|----------|
+| dep-a      | v1.2.0  | v1.3.0 | Yes     | No               | compatible    | healthy  |
+| dep-b      | v2.0.0  | v3.0.0 | Yes     | Yes (MIT→GPL-3.0)| incompatible  | critical |
 
 ### Risk Details
 - **dep-b**: License changed from MIT to GPL-3.0.
@@ -200,6 +281,7 @@ mode: "report"
 ## License Analysis
 - **License**: <spdx-id>
 - **OSI Status**: Approved / Not Approved / Unknown
+- **Compatibility**: <tier> (<verdict>)
 - **Verdict**: <explanation>
 
 ## Community Health
@@ -327,10 +409,10 @@ then include structured prose:
 
 | Mode | Prefix | Required content |
 |------|--------|------------------|
-| Discover | `scouting-report:` | Project names, license verdicts (adopt/evaluate/defer/avoid), query used, overlapping deps if detected |
+| Discover | `scouting-report:` | Project names, license verdicts with compatibility tier and verdict (e.g., "testify (MIT, permissive/compatible, adopt)"), query used, overlapping deps if detected |
 | Trend | `trend-report:` | Project names, composite trend rank, star growth %, release velocity, contributor activity |
 | Audit | `dependency-audit:` | Manifest path, dep count, deps with updates, deps with license changes, risk levels (healthy/warning/critical) |
-| Report | `adoption-report:` | Project URL, overall verdict, key risk factors, license classification |
+| Report | `adoption-report:` | Project URL, overall verdict, key risk factors, license classification with compatibility tier and verdict |
 
 **Discovery note**: The primary discovery path for
 stored learnings is `dewey_semantic_search` (content
@@ -623,20 +705,30 @@ When the user requests an adoption recommendation:
    ecosystem.
 
 9. **Recommendation verdict**: Assign a verdict based on
-   the combined analysis:
-   - `adopt`: OSI-approved license, healthy maintenance
-     (no `critical` or `warning` indicators), positive
+   the combined analysis. The compatibility verdict
+   (from License Compatibility) acts as a hard gate —
+   see Compatibility-Gated Recommendation table.
+   - `adopt`: `compatible` compatibility verdict,
+     OSI-approved license, healthy maintenance (no
+     `critical` or `warning` indicators), positive
      trend trajectory (star growth > 5%, active releases,
      growing contributors), no dependency conflicts.
-   - `evaluate`: OSI-approved license but has concerns —
+   - `evaluate`: `compatible` or `caution` compatibility
+     verdict, OSI-approved license but has concerns —
      some `warning` indicators, flat trend trajectory,
-     or minor dependency version conflicts.
-   - `defer`: OSI-approved license but significant
+     or minor dependency version conflicts. Also the
+     maximum verdict for `caution` (weak-copyleft)
+     licenses regardless of other signals.
+   - `defer`: `compatible` or `caution` compatibility
+     verdict, OSI-approved license but significant
      concerns — `critical` maintenance risk, declining
      trend trajectory, or major dependency conflicts.
-   - `avoid`: License is not OSI-approved, or `critical`
+   - `avoid`: `incompatible` compatibility verdict
+     (strong-copyleft or non-OSI license), or `critical`
      supply chain risks exist (archived dependency,
-     license changed to non-OSI-approved).
+     license changed to non-OSI-approved). An
+     `incompatible` license overrides all positive
+     health signals.
 
 10. **Format**: Use the Recommendation Report format
     with YAML frontmatter and all required sections.

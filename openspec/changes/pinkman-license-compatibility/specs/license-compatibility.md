@@ -1,0 +1,209 @@
+## ADDED Requirements
+
+### Requirement: License Compatibility Tier
+
+After classifying a project's license as OSI-approved
+or not, Pinkman MUST assign a compatibility tier:
+
+| Tier | Licenses |
+|------|----------|
+| `permissive` | MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense, 0BSD, Zlib, BSL-1.0 |
+| `weak-copyleft` | LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later, MPL-2.0, EPL-2.0, EUPL-1.2, Artistic-2.0 |
+| `strong-copyleft` | GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later |
+| `unknown` | Any license not in the above tiers |
+
+#### Scenario: Permissive license classified correctly
+- **GIVEN** a project with license `MIT`
+- **WHEN** Pinkman runs License Classification
+- **THEN** the compatibility tier MUST be `permissive`
+
+#### Scenario: Strong-copyleft license classified correctly
+- **GIVEN** a project with license `GPL-3.0-only`
+- **WHEN** Pinkman runs License Classification
+- **THEN** the compatibility tier MUST be
+  `strong-copyleft`
+
+#### Scenario: Weak-copyleft license classified correctly
+- **GIVEN** a project with license `MPL-2.0`
+- **WHEN** Pinkman runs License Classification
+- **THEN** the compatibility tier MUST be
+  `weak-copyleft`
+
+#### Scenario: Unrecognized license gets unknown tier
+- **GIVEN** a project with an OSI-approved license not
+  in the tier table (e.g., a newly approved license)
+- **WHEN** Pinkman runs License Classification
+- **THEN** the compatibility tier MUST be `unknown`
+
+### Requirement: Compatibility Verdict
+
+Pinkman MUST produce a compatibility verdict for each
+project based on its compatibility tier and the
+reference license (Apache-2.0):
+
+| Tier | Verdict |
+|------|---------|
+| `permissive` | `compatible` |
+| `weak-copyleft` | `caution` |
+| `strong-copyleft` | `incompatible` |
+| `unknown` | `caution` |
+
+For non-OSI licenses (`not_approved` verdict), the
+compatibility verdict MUST be `incompatible`.
+
+For non-standard licenses (`manual_review` verdict),
+the compatibility verdict MUST be `caution`.
+
+#### Scenario: Permissive license is compatible
+- **GIVEN** a project with license `Apache-2.0`
+- **WHEN** Pinkman produces the compatibility verdict
+- **THEN** the verdict MUST be `compatible`
+
+#### Scenario: GPL project is incompatible
+- **GIVEN** a project with license `GPL-3.0-only`
+- **WHEN** Pinkman produces the compatibility verdict
+- **THEN** the verdict MUST be `incompatible`
+
+#### Scenario: LGPL project gets caution
+- **GIVEN** a project with license `LGPL-3.0-only`
+- **WHEN** Pinkman produces the compatibility verdict
+- **THEN** the verdict MUST be `caution`
+
+### Requirement: Dual-License Compatibility
+
+For dual-licensed projects (SPDX `OR` expression),
+Pinkman MUST evaluate each license option
+independently and use the most favorable (least
+restrictive) compatibility tier.
+
+Tier ordering from most to least favorable:
+`permissive` > `weak-copyleft` > `strong-copyleft`
+> `unknown`.
+
+#### Scenario: Dual-license with permissive option
+- **GIVEN** a project with license `MIT OR GPL-3.0`
+- **WHEN** Pinkman evaluates compatibility
+- **THEN** the compatibility tier MUST be `permissive`
+  (from MIT)
+- **AND** the compatibility verdict MUST be `compatible`
+
+#### Scenario: Dual-license both copyleft
+- **GIVEN** a project with license `LGPL-3.0 OR GPL-3.0`
+- **WHEN** Pinkman evaluates compatibility
+- **THEN** the compatibility tier MUST be
+  `weak-copyleft` (from LGPL-3.0, more favorable)
+- **AND** the compatibility verdict MUST be `caution`
+
+### Requirement: Compatibility-Gated Recommendation
+
+The compatibility verdict MUST act as a hard gate on
+the recommendation verdict:
+
+| Compatibility | Maximum recommendation |
+|---------------|-----------------------|
+| `compatible` | `adopt` |
+| `caution` | `evaluate` |
+| `incompatible` | `avoid` |
+
+#### Scenario: Healthy GPL project gets avoid
+- **GIVEN** a project with license `GPL-3.0-only`,
+  healthy maintenance, positive trend trajectory,
+  and no dependency conflicts
+- **WHEN** Pinkman assigns the recommendation verdict
+- **THEN** the verdict MUST be `avoid`
+- **AND** the reason MUST reference the license
+  incompatibility with Apache-2.0
+
+#### Scenario: Healthy LGPL project capped at evaluate
+- **GIVEN** a project with license `LGPL-3.0-only`,
+  healthy maintenance, positive trend trajectory,
+  and no dependency conflicts
+- **WHEN** Pinkman assigns the recommendation verdict
+- **THEN** the verdict MUST NOT be `adopt`
+- **AND** the verdict MUST be `evaluate` at most
+- **AND** the reason MUST note the weak-copyleft
+  `caution` status and recommend legal review
+
+#### Scenario: Healthy permissive project can get adopt
+- **GIVEN** a project with license `MIT`, healthy
+  maintenance, positive trend trajectory, and no
+  dependency conflicts
+- **WHEN** Pinkman assigns the recommendation verdict
+- **THEN** the verdict MAY be `adopt`
+  (compatibility does not block it)
+
+### Requirement: Compatibility in Output Formats
+
+All Pinkman output formats MUST include the
+compatibility tier and verdict for each project:
+
+- **Discover/Trend Result List**: Add
+  `- **Compatibility**: <tier> (<verdict>)` line
+  after the License line.
+- **Audit Result Table**: Add a `Compatibility`
+  column after the `License Changed?` column.
+- **Recommendation Report**: Add a
+  `- **Compatibility**: <tier> (<verdict>)` line
+  in the License Analysis section.
+
+#### Scenario: Discover output shows compatibility
+- **GIVEN** Pinkman discovers a project with license
+  `GPL-3.0-only`
+- **WHEN** the output is formatted
+- **THEN** the project entry MUST include
+  `- **Compatibility**: strong-copyleft (incompatible)`
+
+### Requirement: Compatibility in Dewey Learnings
+
+The structured prose in Dewey learnings (per the
+pinkman-dewey-enrichment change) MUST include the
+compatibility verdict for each project.
+
+#### Scenario: Dewey learning includes compatibility
+- **GIVEN** Pinkman discovers 3 projects with verdicts
+  `compatible`, `caution`, and `incompatible`
+- **WHEN** the learning is stored via
+  `dewey_store_learning`
+- **THEN** the information string MUST include the
+  compatibility verdict for each project (e.g.,
+  "testify (MIT, permissive/compatible, adopt)")
+
+## MODIFIED Requirements
+
+### Requirement: License Classification (Spec 032)
+
+Previously: License Classification produces an OSI
+verdict (approved, not_approved, unknown,
+manual_review, dual_approved) and stops.
+
+Updated: After producing the OSI verdict, License
+Classification MUST also assign a compatibility tier
+and produce a compatibility verdict per the
+requirements above. The OSI verdict is unchanged.
+
+### Requirement: Recommendation Verdict (Spec 032)
+
+Previously: `adopt` requires "OSI-approved license,
+healthy maintenance, positive trend trajectory, no
+dependency conflicts." `avoid` requires "License is
+not OSI-approved, or critical supply chain risks."
+
+Updated: `adopt` additionally requires `compatible`
+compatibility verdict. `avoid` additionally includes
+`incompatible` compatibility verdict as a trigger.
+`evaluate` is the maximum for `caution` compatibility
+verdict. All other criteria remain unchanged.
+
+### Requirement: Fallback License List (Spec 032)
+
+Previously: A flat comma-separated list of
+OSI-approved SPDX identifiers.
+
+Updated: Each license in the fallback list MUST
+include its compatibility tier annotation in
+parentheses (e.g., `MIT (permissive)`,
+`GPL-3.0-only (strong-copyleft)`).
+
+## REMOVED Requirements
+
+None.
