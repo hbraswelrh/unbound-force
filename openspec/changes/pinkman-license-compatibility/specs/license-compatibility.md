@@ -54,6 +54,20 @@ compatibility verdict MUST be `incompatible`.
 For non-standard licenses (`manual_review` verdict),
 the compatibility verdict MUST be `caution`.
 
+#### Scenario: Non-OSI license is incompatible
+- **GIVEN** a project with a non-OSI-approved license
+  (e.g., SSPL-1.0)
+- **WHEN** Pinkman produces the compatibility verdict
+- **THEN** the verdict MUST be `incompatible`
+- **AND** the recommendation MUST be `avoid`
+
+#### Scenario: Non-standard license gets caution
+- **GIVEN** a project with a custom/non-standard
+  license text
+- **WHEN** Pinkman produces the compatibility verdict
+- **THEN** the verdict MUST be `caution`
+- **AND** the recommendation MUST NOT exceed `evaluate`
+
 #### Scenario: Permissive license is compatible
 - **GIVEN** a project with license `Apache-2.0`
 - **WHEN** Pinkman produces the compatibility verdict
@@ -78,21 +92,77 @@ restrictive) compatibility tier.
 
 Tier ordering from most to least favorable:
 `permissive` > `weak-copyleft` > `strong-copyleft`
-> `unknown`.
+> `unknown`. The `unknown` tier is ranked least
+favorable because an unclassified license carries
+unbounded risk — at least `strong-copyleft` obligations
+are well-understood.
 
 #### Scenario: Dual-license with permissive option
-- **GIVEN** a project with license `MIT OR GPL-3.0`
+- **GIVEN** a project with license `MIT OR GPL-3.0-only`
 - **WHEN** Pinkman evaluates compatibility
 - **THEN** the compatibility tier MUST be `permissive`
   (from MIT)
 - **AND** the compatibility verdict MUST be `compatible`
 
 #### Scenario: Dual-license both copyleft
-- **GIVEN** a project with license `LGPL-3.0 OR GPL-3.0`
+- **GIVEN** a project with license `LGPL-3.0-only OR GPL-3.0-only`
 - **WHEN** Pinkman evaluates compatibility
 - **THEN** the compatibility tier MUST be
-  `weak-copyleft` (from LGPL-3.0, more favorable)
+  `weak-copyleft` (from LGPL-3.0-only, more favorable)
 - **AND** the compatibility verdict MUST be `caution`
+
+#### Scenario: Dual-license with unknown option
+- **GIVEN** a project with license
+  `GPL-3.0-only OR FooBarLicense`
+- **WHEN** Pinkman evaluates compatibility
+- **THEN** the compatibility tier MUST be
+  `strong-copyleft` (from GPL-3.0-only, more favorable
+  than `unknown`)
+- **AND** the compatibility verdict MUST be
+  `incompatible`
+
+### Non-Goal: SPDX `AND` Expressions
+
+Conjunctive license expressions (SPDX `AND`, e.g.,
+`Apache-2.0 AND GPL-3.0-only`) are out of scope for
+this change. When Pinkman encounters an `AND`
+expression, it MUST classify the compatibility tier
+as `unknown` and produce a `caution` verdict. This is
+a conservative default that requires human legal
+review — `AND` means both licenses apply
+simultaneously, and the interaction between
+conjunctive obligations is too nuanced for automated
+classification.
+
+#### Scenario: AND expression gets caution default
+- **GIVEN** a project with license
+  `Apache-2.0 AND GPL-3.0-only`
+- **WHEN** Pinkman evaluates compatibility
+- **THEN** the compatibility tier MUST be `unknown`
+- **AND** the compatibility verdict MUST be `caution`
+- **AND** the recommendation MUST NOT exceed `evaluate`
+
+### Non-Goal: SPDX `WITH` License Exceptions
+
+License exceptions (SPDX `WITH`, e.g.,
+`GPL-2.0-only WITH Classpath-exception-2.0`) are out
+of scope for this change. When Pinkman encounters a
+`WITH` expression, it MUST classify the compatibility
+tier as `unknown` and produce a `caution` verdict.
+License exceptions can materially change copyleft
+obligations (e.g., the Classpath exception removes
+linking requirements), but mapping individual
+exceptions to tier adjustments is too complex for v1.
+The `caution` verdict directs users to seek legal
+review.
+
+#### Scenario: WITH expression gets caution default
+- **GIVEN** a project with license
+  `GPL-2.0-only WITH Classpath-exception-2.0`
+- **WHEN** Pinkman evaluates compatibility
+- **THEN** the compatibility tier MUST be `unknown`
+- **AND** the compatibility verdict MUST be `caution`
+- **AND** the recommendation MUST NOT exceed `evaluate`
 
 ### Requirement: Compatibility-Gated Recommendation
 
@@ -156,8 +226,8 @@ compatibility tier and verdict for each project:
 ### Requirement: Compatibility in Dewey Learnings
 
 The structured prose in Dewey learnings (per the
-pinkman-dewey-enrichment change) MUST include the
-compatibility verdict for each project.
+Dewey Integration section in pinkman.md) MUST include
+the compatibility verdict for each project.
 
 #### Scenario: Dewey learning includes compatibility
 - **GIVEN** Pinkman discovers 3 projects with verdicts
