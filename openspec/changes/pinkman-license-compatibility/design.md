@@ -38,6 +38,13 @@ modified.
   project-to-ecosystem compatibility is assessed.
 - Configurable project license. The reference license
   is hardcoded as Apache-2.0 per Spec 002.
+- SPDX `AND` expressions. Conjunctive licenses (both
+  apply simultaneously) fall through to `unknown` /
+  `caution` as a safe default requiring human review.
+- SPDX `WITH` exceptions. License exceptions (e.g.,
+  Classpath exception on GPL) fall through to `unknown`
+  / `caution`. Mapping individual exceptions to tier
+  adjustments is too complex for v1.
 - Modifying any hero agent file, schema registry entry,
   or Go source code.
 
@@ -47,9 +54,9 @@ modified.
 
 | Tier | Licenses | Derivative work obligation |
 |------|----------|---------------------------|
-| `permissive` | MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense, 0BSD, Zlib, BSL-1.0 | None or minimal — attribution only |
-| `weak-copyleft` | LGPL-2.1, LGPL-3.0, MPL-2.0, EPL-2.0, EUPL-1.2, Artistic-2.0 | File-level or linking-exception — modifications to the library must be shared, but the consuming project is not a derivative work if linked as a library |
-| `strong-copyleft` | GPL-2.0, GPL-3.0, AGPL-3.0 | Full — any derivative work must be distributed under the same license |
+| `permissive` | MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense, 0BSD, Zlib, BSL-1.0 (Boost Software License — not to be confused with BUSL-1.1 Business Source License) | None or minimal — attribution only |
+| `weak-copyleft` | LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later, MPL-2.0, EPL-2.0, EUPL-1.2, Artistic-2.0 | File-level or linking-exception — modifications to the library must be shared, but the consuming project is not a derivative work if linked as a library |
+| `strong-copyleft` | GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later | Full — any derivative work must be distributed under the same license |
 
 **Rationale**: Three tiers map cleanly to three
 risk levels for an Apache-2.0 project. Permissive
@@ -109,11 +116,11 @@ For dual-licensed projects (SPDX `OR` expression),
 evaluate each option independently and use the most
 favorable compatible tier:
 
-- `MIT OR GPL-3.0` → permissive (MIT is permissive)
-- `LGPL-3.0 OR GPL-3.0` → weak-copyleft (LGPL is
-  more favorable)
-- `GPL-3.0 OR AGPL-3.0` → strong-copyleft (both are
-  strong-copyleft)
+- `MIT OR GPL-3.0-only` → permissive (MIT is permissive)
+- `LGPL-3.0-only OR GPL-3.0-only` → weak-copyleft
+  (LGPL is more favorable)
+- `GPL-3.0-only OR AGPL-3.0-only` → strong-copyleft
+  (both are strong-copyleft)
 
 **Rationale**: Dual-license models exist specifically
 to offer flexibility. Evaluating only the most
@@ -150,7 +157,10 @@ Spec 002 already establishes Apache-2.0 as the
 recommended license for all hero repositories. A
 hardcoded reference is simpler, deterministic, and
 avoids edge cases where `LICENSE` is missing or
-contains non-standard text.
+contains non-standard text. If the project license
+changes from Apache-2.0, update the reference in the
+License Compatibility section and re-evaluate all
+tier-to-verdict mappings.
 
 ## Risks / Trade-offs
 

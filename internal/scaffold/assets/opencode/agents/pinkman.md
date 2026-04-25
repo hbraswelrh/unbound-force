@@ -148,6 +148,12 @@ each detected license into a compatibility tier based
 on its derivative work obligations:
 
 ### Compatibility Tier Table
+<!-- Tier table last reviewed: 2026-04-25. Review annually or when OSI approves new license categories. -->
+
+Note: BSL-1.0 refers to the Boost Software License 1.0
+(permissive). Do not confuse with BUSL-1.1 (Business
+Source License), which is NOT OSI-approved and MUST be
+classified as `not_approved` / `incompatible`.
 
 | Tier | Licenses | Obligation |
 |------|----------|------------|
@@ -186,10 +192,21 @@ Tier ordering from most to least favorable:
 > `unknown`.
 
 Examples:
-- `MIT OR GPL-3.0` → `permissive` / `compatible`
-- `LGPL-3.0 OR GPL-3.0` → `weak-copyleft` / `caution`
-- `GPL-3.0 OR AGPL-3.0` → `strong-copyleft` /
-  `incompatible`
+- `MIT OR GPL-3.0-only` → `permissive` / `compatible`
+- `LGPL-3.0-only OR GPL-3.0-only` → `weak-copyleft` /
+  `caution`
+- `GPL-3.0-only OR AGPL-3.0-only` → `strong-copyleft`
+  / `incompatible`
+
+### SPDX `AND` and `WITH` Expressions
+
+SPDX `AND` expressions (conjunctive — both licenses
+apply) and `WITH` expressions (license exceptions)
+are not evaluated by the tier classification. When
+Pinkman encounters an `AND` or `WITH` expression,
+classify the compatibility tier as `unknown` and
+produce a `caution` verdict. This conservative default
+requires human legal review.
 
 ### Compatibility-Gated Recommendation
 
