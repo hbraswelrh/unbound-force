@@ -1,21 +1,21 @@
 ## 1. Idempotent marker insertion
 
-- [ ] 1.1 Add `stripExistingMarkers(s string) string` to
+- [x] 1.1 Add `stripExistingMarkers(s string) string` to
   `internal/scaffold/scaffold.go`. The function removes all
   lines whose trimmed content starts with
   `<!-- scaffolded by uf ` or `# scaffolded by uf `.
   Preserves all other lines including blank lines.
-- [ ] 1.2 Modify `insertMarkerAfterFrontmatter` to call
+- [x] 1.2 Modify `insertMarkerAfterFrontmatter` to call
   `stripExistingMarkers` on its input string before
   proceeding with the existing frontmatter detection and
   marker insertion logic.
 
 ## 2. Fix double-v version prefix
 
-- [ ] 2.1 In `.goreleaser.yaml`, change the `unbound-force`
+- [x] 2.1 In `.goreleaser.yaml`, change the `unbound-force`
   build ldflags from `-X main.version={{.Tag}}` to
   `-X main.version={{.Version}}` (line 18).
-- [ ] 2.2 In `.goreleaser.yaml`, change the `mxf` build
+- [x] 2.2 In `.goreleaser.yaml`, change the `mxf` build
   ldflags from `-X main.version={{.Tag}}` to
   `-X main.version={{.Version}}` (line 35).
 
@@ -25,13 +25,13 @@ Strip duplicate markers from all files under
 `internal/scaffold/assets/` so each has exactly one
 `<!-- scaffolded by uf vdev -->` line after frontmatter.
 
-- [ ] 3.1 Clean `internal/scaffold/assets/opencode/command/`
+- [x] 3.1 Clean `internal/scaffold/assets/opencode/command/`
   (6 files: cobalt-crush.md, constitution-check.md,
   finale.md, review-council.md, uf-init.md, unleash.md)
-- [ ] 3.2 Clean `internal/scaffold/assets/opencode/uf/packs/`
+- [x] 3.2 Clean `internal/scaffold/assets/opencode/uf/packs/`
   (5 files: content.md, default.md, go.md, severity.md,
   typescript.md)
-- [ ] 3.3 Clean
+- [x] 3.3 Clean
   `internal/scaffold/assets/opencode/skill/speckit-workflow/SKILL.md`
 
 ## 4. Clean up live files
@@ -40,12 +40,12 @@ Strip duplicate markers from all live files so each has
 exactly one `<!-- scaffolded by uf vdev -->` line after
 frontmatter.
 
-- [ ] 4.1 Clean `.opencode/command/` embedded counterparts
+- [x] 4.1 Clean `.opencode/command/` embedded counterparts
   (6 files matching task 3.1)
-- [ ] 4.2 Clean `.opencode/uf/packs/` files
+- [x] 4.2 Clean `.opencode/uf/packs/` files
   (5 files matching task 3.2)
-- [ ] 4.3 Clean `.opencode/skill/speckit-workflow/SKILL.md`
-- [ ] 4.4 Clean non-embedded speckit commands
+- [x] 4.3 Clean `.opencode/skill/speckit-workflow/SKILL.md`
+- [x] 4.4 Clean non-embedded speckit commands
   (9 files: speckit.analyze.md, speckit.checklist.md,
   speckit.clarify.md, speckit.constitution.md,
   speckit.implement.md, speckit.plan.md, speckit.specify.md,
@@ -53,28 +53,28 @@ frontmatter.
 
 ## 5. Update tests
 
-- [ ] 5.1 Add `TestStripExistingMarkers` to
+- [x] 5.1 Add `TestStripExistingMarkers` to
   `scaffold_test.go` covering: no markers, single marker,
   multiple markers, mixed HTML/hash markers, content
   preservation, frontmatter preservation.
-- [ ] 5.2 Update the `"double insert on repeat call"` test
+- [x] 5.2 Update the `"double insert on repeat call"` test
   case in `TestInsertMarkerAfterFrontmatter`. Change
   expected output from double-marker to single-marker
   (function is now idempotent).
-- [ ] 5.3 Add `TestEmbeddedAssets_SingleMarker` regression
+- [x] 5.3 Add `TestEmbeddedAssets_SingleMarker` regression
   test: walk all embedded `.md` assets and assert each
   contains at most one line matching the scaffold marker
   pattern.
 
 ## 6. Verification
 
-- [ ] 6.1 Run `go test -race -count=1 ./...` and confirm
+- [x] 6.1 Run `go test -race -count=1 ./...` and confirm
   all tests pass (including drift detection).
-- [ ] 6.2 Run `go vet ./...` and confirm no issues.
-- [ ] 6.3 Run `golangci-lint run` and confirm no issues.
-- [ ] 6.4 Verify no file in the repo contains more than one
+- [x] 6.2 Run `go vet ./...` and confirm no issues.
+- [x] 6.3 Run `golangci-lint run` and confirm no issues.
+- [x] 6.4 Verify no file in the repo contains more than one
   scaffold marker line (grep check).
-- [ ] 6.5 Constitution alignment: Observable Quality (III)
+- [x] 6.5 Constitution alignment: Observable Quality (III)
   -- provenance markers are correct (single, accurate
   version); Testability (IV) -- new pure functions have
   isolation tests.
