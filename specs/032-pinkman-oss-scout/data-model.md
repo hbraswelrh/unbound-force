@@ -16,6 +16,8 @@ scouting invocation.
 | license_spdx_id        | string      | SPDX identifier for the project's license              |
 | license_verdict        | enum        | OSI approval status (see License Verdict below)        |
 | license_explanation    | string      | Human-readable explanation of the verdict              |
+| compatibility_tier     | enum        | License compatibility tier (see below)                 |
+| compatibility_verdict  | enum        | Compatibility verdict vs Apache-2.0 (see below)        |
 | stars                  | integer     | Total star count at time of scouting                   |
 | forks                  | integer     | Total fork count at time of scouting                   |
 | star_growth_rate       | float       | Stars gained in last 90 days as % of total             |
@@ -46,6 +48,37 @@ scouting invocation.
 | `unknown`           | No license file detected in the project                  |
 | `manual_review`     | Non-standard or custom license requires human review     |
 | `dual_approved`     | Dual-license project; at least one option is OSI-approved |
+
+### Compatibility Tier (Enum)
+
+Added by opsx/pinkman-license-compatibility.
+
+| Value              | Description                                              |
+|--------------------|----------------------------------------------------------|
+| `permissive`       | No derivative work obligations (MIT, Apache-2.0, BSD, ISC, etc.) |
+| `weak-copyleft`    | File-level or linking-exception copyleft (LGPL, MPL-2.0, etc.) |
+| `strong-copyleft`  | Full copyleft — derivative works must use same license (GPL, AGPL) |
+| `unknown`          | License not in tier table, SPDX AND/WITH expression, or unrecognized |
+
+### Compatibility Verdict (Enum)
+
+Added by opsx/pinkman-license-compatibility.
+
+| Value           | Description                                              |
+|-----------------|----------------------------------------------------------|
+| `compatible`    | No conflict with Apache-2.0 (permissive tier)            |
+| `caution`       | May be compatible depending on usage; requires legal review (weak-copyleft, unknown) |
+| `incompatible`  | Derivative work obligations conflict with Apache-2.0 (strong-copyleft, not_approved) |
+
+### Compatibility Gate
+
+The compatibility verdict caps the recommendation:
+
+| Compatibility | Maximum recommendation |
+|---------------|-----------------------|
+| `compatible`  | `adopt`               |
+| `caution`     | `evaluate`            |
+| `incompatible`| `avoid`               |
 
 ### Dependency Reference
 

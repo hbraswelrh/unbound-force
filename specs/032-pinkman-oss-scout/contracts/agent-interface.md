@@ -50,6 +50,7 @@ recommendation document.
 #### 1. <project-name>
 - **URL**: <repository-url>
 - **License**: <spdx-id> (OSI-approved)
+- **Compatibility**: <tier> (<verdict>)
 - **Language**: <primary-language>
 - **Stars**: N (↑X% in 90d)
 - **Releases**: N in 6mo
@@ -75,10 +76,10 @@ recommendation document.
 ## Dependency Audit: <manifest-path>
 **Date**: YYYY-MM-DD | **Dependencies**: N total
 
-| Dependency | Current | Latest | Update? | License Changed? | Risk     |
-|------------|---------|--------|---------|------------------|----------|
-| dep-a      | v1.2.0  | v1.3.0 | Yes     | No               | healthy  |
-| dep-b      | v2.0.0  | v3.0.0 | Yes     | Yes (MIT→GPL-3.0) | critical |
+| Dependency | Current | Latest | Update? | License Changed? | Compatibility | Risk     |
+|------------|---------|--------|---------|------------------|---------------|----------|
+| dep-a      | v1.2.0  | v1.3.0 | Yes     | No               | compatible    | healthy  |
+| dep-b      | v2.0.0  | v3.0.0 | Yes     | Yes (MIT→GPL-3.0)| incompatible  | critical |
 | dep-c      | v0.5.0  | v0.5.0 | No      | No               | warning  |
 
 ### Risk Details
@@ -105,6 +106,7 @@ mode: "report"
 ## License Analysis
 - **License**: <spdx-id>
 - **OSI Status**: Approved / Not Approved / Unknown
+- **Compatibility**: <tier> (<verdict>)
 - **Verdict**: <explanation>
 
 ## Community Health
@@ -153,12 +155,29 @@ The agent creates the directory if it does not exist.
 
 ### Dewey Integration (Optional)
 
-When Dewey is available, the agent stores a summary
-of each scouting session via `dewey_store_learning`:
-- **tag**: `pinkman`
+When Dewey is available, the agent stores a structured
+summary of each scouting session via
+`dewey_store_learning` with mode-specific tags and
+content prefixes (updated by
+opsx/pinkman-dewey-enrichment):
+
+- **tag**: `pinkman-<mode>` (e.g., `pinkman-discover`,
+  `pinkman-trend`, `pinkman-audit`, `pinkman-report`).
+  Hyphen-separated because `dewey_store_learning`
+  strips `/` from tag values.
 - **category**: `reference`
-- **information**: Condensed summary of results (project
-  names, verdicts, key metrics)
+- **information**: Mode-specific prefix followed by
+  structured prose with project names, license verdicts
+  with compatibility tier/verdict, key metrics, and
+  query context. Prefixes: `scouting-report:`,
+  `trend-report:`, `dependency-audit:`,
+  `adoption-report:`.
+
+Primary discovery path for stored learnings is
+`dewey_semantic_search` (content similarity). Tags
+serve as filters via
+`dewey_semantic_search_filtered(has_tag: ...)`. Do NOT
+use `dewey_find_by_tag` for learning discovery.
 
 Prior to scouting, the agent queries
 `dewey_semantic_search` for past evaluations of the

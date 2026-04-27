@@ -192,7 +192,7 @@ projects appear in a separate section.
   the project's output per data-model.md Dependency
   Reference entity. Handle missing manifests: report
   "dependencies unknown -- no manifest detected" and set
-  has_manifest to false. Per FR-006a, research.md R4.
+  has_manifest to false. Per FR-014, research.md R4.
 
 - [x] T012 [US1] Add H2 "Dependency Overlap Detection"
   section to `.opencode/agents/pinkman.md`: Instructions
@@ -203,7 +203,7 @@ projects appear in a separate section.
   name, list of projects using it, version used by each,
   and whether versions conflict, (4) format as a Shared
   Dependencies table per contracts/agent-interface.md.
-  Per FR-006b, FR-006c, data-model.md Dependency Overlap
+  Per FR-015, FR-016, data-model.md Dependency Overlap
   entity, plan.md D5.
 
 - [x] T013 [US1] Add H2 "Incompatible Projects Section"
@@ -400,19 +400,19 @@ to `.uf/pinkman/reports/`.
 **Purpose**: Embed Pinkman files in the scaffold engine,
 update tests, and update documentation.
 
-- [ ] T024 [P] Copy `.opencode/agents/pinkman.md` to
+- [x] T024 [P] Copy `.opencode/agents/pinkman.md` to
   `internal/scaffold/assets/opencode/agents/pinkman.md`
   as the embedded scaffold asset copy. Ensure exact
   byte-for-byte match with the canonical file. Per
   research.md R6.
 
-- [ ] T025 [P] Copy `.opencode/command/scout.md` to
+- [x] T025 [P] Copy `.opencode/command/scout.md` to
   `internal/scaffold/assets/opencode/command/scout.md`
   as the embedded scaffold asset copy. Ensure exact
   byte-for-byte match with the canonical file. Per
   research.md R6.
 
-- [ ] T026 Update `expectedAssetPaths` in
+- [x] T026 Update `expectedAssetPaths` in
   `internal/scaffold/scaffold_test.go`: add
   `"opencode/agents/pinkman.md"` to the agents section
   (alphabetically after `onboarding.md`) and
@@ -421,12 +421,12 @@ update tests, and update documentation.
   count changes from 35 to 37. Per research.md R6,
   Spec 031 pattern.
 
-- [ ] T027 Update `cmd/unbound-force/main_test.go`:
+- [x] T027 Update `cmd/unbound-force/main_test.go`:
   change the `"35 files processed"` assertion to
   `"37 files processed"` to match the new embedded
   asset count. Per Spec 031 pattern.
 
-- [ ] T028 Verify `isToolOwned` behavior in
+- [x] T028 Verify `isToolOwned` behavior in
   `internal/scaffold/scaffold.go`: confirm that
   `pinkman.md` returns false (user-owned) and
   `scout.md` returns true (tool-owned) based on
@@ -434,7 +434,7 @@ update tests, and update documentation.
   `isToolOwned` function does not correctly classify
   these files, update it. Per plan.md D6.
 
-- [ ] T029 Run `go build ./...` and
+- [x] T029 Run `go build ./...` and
   `go test -race -count=1 ./...` to verify all scaffold
   drift detection tests pass, file count assertions are
   correct, and no compilation errors exist.
@@ -449,7 +449,7 @@ update tests, and update documentation.
 **Purpose**: Documentation, AGENTS.md updates, and
 validation.
 
-- [ ] T030 [P] Update AGENTS.md: add Pinkman to the
+- [x] T030 [P] Update AGENTS.md: add Pinkman to the
   "Utility Agents (Non-Hero)" table with columns: Agent
   = "Pinkman", Role = "OSS project scouting and license
   compatibility", File =
@@ -461,17 +461,17 @@ validation.
   listing. Update the `expectedAssetPaths` count in the
   Active Technologies section if referenced.
 
-- [ ] T031 [P] Update `specs/032-pinkman-oss-scout/spec.md`:
+- [x] T031 [P] Update `specs/032-pinkman-oss-scout/spec.md`:
   change **Status** from "Draft" to "Complete".
 
-- [ ] T032 Run the quickstart.md validation: invoke each
+- [x] T032 Run the quickstart.md validation: invoke each
   command from `specs/032-pinkman-oss-scout/quickstart.md`
   (`/scout static analysis Go`, `/scout --trend MCP
   servers`, `/scout --audit`, `/scout --report <url>`)
   and verify each produces output matching the expected
   format from contracts/agent-interface.md.
 
-- [ ] T033 Assess documentation impact per AGENTS.md
+- [x] T033 Assess documentation impact per AGENTS.md
   Documentation Validation Gate. Determine whether a
   GitHub issue is needed in `unbound-force/website` for
   the new `/scout` command and Pinkman agent. If user-

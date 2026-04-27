@@ -225,6 +225,68 @@ still apply. But an `incompatible` license overrides
 all positive signals. The `caution` tier caps at
 `evaluate` to flag the need for human legal review.
 
+### Human Approval Gate
+
+Before including any project with a non-permissive
+license in the final output, MUST prompt the user for
+approval. Projects with `compatible` compatibility
+verdict proceed silently — no prompt needed.
+
+**Triggers**: Any project with `caution` verdict
+(weak-copyleft, unknown, manual_review), `incompatible`
+verdict (strong-copyleft, not_approved), SPDX `AND` or
+`WITH` expression, or dual-license where one option is
+copyleft.
+
+**Report mode** (single project): Prompt inline:
+```
+Project: <name>
+License: <spdx-id> (<tier>, <verdict>)
+
+This license has <obligation description>.
+
+Options:
+1. Include with '<max recommendation>' verdict
+2. Include with 'avoid' verdict
+3. Exclude from results entirely
+```
+
+**Discover/Trend mode** (multiple projects): Prompt as
+a batch after classification, before final output:
+```
+N of M projects have licensing concerns:
+
+1. <name>: <spdx-id> (<verdict>)
+2. <name>: <spdx-id> (<verdict>)
+...
+
+Options:
+1. Include all with appropriate verdicts
+2. Exclude all from results
+3. Review each individually
+```
+
+**Audit mode**: Prompt when a dependency's license
+changed to a non-permissive license:
+```
+<dep> <old-version> → <new-version>:
+License changed <old-license> → <new-license>
+Compatibility: <verdict>
+
+Options:
+1. Flag as critical risk (recommend staying on
+   <old-version>)
+2. Flag as warning (note change, no recommendation)
+3. Skip this dependency's license analysis
+```
+
+**Outcome handling**:
+- If user selects "exclude": omit the project from the
+  final output AND from the Dewey learning.
+- If user selects "include": note the user's decision
+  in the output as "included per user approval" and
+  include in the Dewey learning.
+
 ## Output Formatting
 
 ### Discover/Trend Result List
@@ -335,6 +397,48 @@ mode: "report"
 **Reason**: <justification>
 ```
 
+## URL Validation
+
+Before making any `webfetch` call, validate the URL:
+
+1. **Scheme**: MUST be `https://`. Reject `http://`,
+   `file://`, `ftp://`, and all other schemes.
+2. **Domain allowlist** (for `--report` mode): The
+   project URL MUST be on a recognized repository host:
+   `github.com`, `gitlab.com`, `gitlab.*`,
+   `bitbucket.org`, `codeberg.org`, `sr.ht`. Reject
+   URLs to other domains with: "URL does not appear to
+   be a supported repository. Supported platforms:
+   GitHub, GitLab, Bitbucket, Codeberg, Sourcehut."
+3. **Private IP rejection**: Reject URLs containing
+   `localhost`, `127.0.0.1`, `::1`, `10.*`, `172.16.*`
+   through `172.31.*`, `192.168.*`, or any private IP
+   range.
+4. **Keyword encoding**: URL-encode user-supplied
+   keywords before interpolating into search URLs
+   (spaces → `%20`, special characters escaped).
+5. **Path traversal in URLs**: Strip `../` sequences
+   from URL paths.
+
+## Request Pacing
+
+To avoid triggering rate limiting on external services:
+
+1. **Detection**: If `webfetch` returns an error page,
+   CAPTCHA challenge, or HTTP 429-like content, treat
+   it as a rate limit signal.
+2. **Backoff**: After a rate limit signal, wait before
+   retrying: 2s, 4s, 8s, 16s, 30s (exponential, max
+   30s). After 3 consecutive failures on the same
+   source, skip that source and note it in results.
+3. **Call cap**: Cap total `webfetch` calls per
+   invocation at 50. When the cap is reached, stop
+   fetching and report partial results with a note:
+   "Request limit reached. Showing N of M results."
+4. **Session caching**: Do not re-fetch the OSI license
+   page if already fetched in this invocation. Cache
+   the result for the duration of the session.
+
 ## Error Handling
 
 Handle each error condition gracefully:
@@ -342,12 +446,14 @@ Handle each error condition gracefully:
 | Condition                    | Behavior                                            |
 |------------------------------|-----------------------------------------------------|
 | OSI site unreachable         | Use fallback license list, note in results header   |
-| GitHub rate-limited          | Report partial results, note which queries failed   |
+| GitHub rate-limited          | Apply backoff per Request Pacing, report partial     |
 | No manifest found (audit)    | Report "no manifest detected", skip dep listing     |
 | Unknown license              | Classify as `unknown`, exclude from compatible list  |
 | Custom/non-standard license  | Classify as `manual_review`, exclude from compatible |
 | No results for query         | Report "no projects found" with search criteria     |
 | Dewey unavailable            | Skip Dewey integration silently, proceed locally    |
+| webfetch unavailable         | Report "external data retrieval unavailable, cannot perform scouting" and stop |
+| URL not a repository         | Report "URL does not appear to be a supported repository" and stop |
 
 Never fail silently without informing the user. Always
 report what worked and what did not.
@@ -361,8 +467,12 @@ results as a Markdown file:
    - Create the directory if it does not exist using the
      `write` tool.
 2. **Filename**: `YYYY-MM-DDTHH-MM-SS-<sanitized-query>.md`
-   - Sanitize the query: replace spaces with hyphens,
-     remove special characters, truncate to 50 chars.
+   - Sanitize the query: keep only alphanumeric
+     characters, hyphens, and underscores. Replace
+     spaces with hyphens. Remove all other characters
+     (including `/`, `\`, `..`, null bytes, and control
+     characters). Truncate to 50 characters. If the
+     result is empty, use `unnamed-query` as fallback.
 3. **YAML frontmatter**:
    ```yaml
    ---

@@ -42,7 +42,7 @@ quality before proceeding to planning
   - License authority changed from hand-curated list
     to OSI-approved license list (user correction)
   - Direct dependency listing and overlap detection
-    added (user addition, FR-006a/b/c)
+    added (user addition, FR-014/015/016)
   - Shared dependency license checking deferred to
     future enhancement (clarification Q1 → answer B)
 - Pinkman classified as non-hero utility agent

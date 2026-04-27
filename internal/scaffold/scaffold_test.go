@@ -564,6 +564,10 @@ func TestIsToolOwned(t *testing.T) {
 		{"opencode/agents/divisor-guard.md", false},
 		{"opencode/agents/divisor-architect.md", false},
 		{"opencode/agents/cobalt-crush-dev.md", false},
+		// User-owned: Pinkman agent (Spec 032)
+		{"opencode/agents/pinkman.md", false},
+		// Tool-owned: scout command (Spec 032)
+		{"opencode/command/scout.md", true},
 		// User-owned: other
 		{"opencode/agents/constitution-check.md", false},
 	}

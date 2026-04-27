@@ -2,7 +2,7 @@
 
 **Feature Branch**: `032-pinkman-oss-scout`
 **Created**: 2026-04-22
-**Status**: Draft
+**Status**: Complete
 **Input**: User description: "Create an agent that is
 called pinkman that will retrieve new or update open
 source projects that track with industry trends and are
@@ -266,14 +266,14 @@ to existing dependencies) in a structured format.
 - **FR-006**: Pinkman MUST detect license changes between
   the currently used version and the latest available
   version of a dependency.
-- **FR-006a**: Pinkman MUST list the direct dependencies
+- **FR-014**: Pinkman MUST list the direct dependencies
   of each scouted project when a dependency manifest is
   available.
-- **FR-006b**: Pinkman MUST identify and highlight
+- **FR-015**: Pinkman MUST identify and highlight
   dependencies that are shared across multiple scouted
   projects in a single result set, reporting the
   dependency name and the count of projects that use it.
-- **FR-006c**: When shared dependencies appear at
+- **FR-016**: When shared dependencies appear at
   conflicting versions across scouted projects, Pinkman
   MUST report the version discrepancy as a supply chain
   signal.
@@ -413,13 +413,41 @@ to existing dependencies) in a structured format.
 - Transitive dependency scanning (future enhancement)
 - Proprietary or paid data source integration
 
+## Maintenance
+
+### Static Data Review
+
+The agent file (`pinkman.md`) contains two static data
+structures that require periodic review:
+
+1. **Fallback License List** (26 SPDX identifiers): A
+   hardcoded list of OSI-approved licenses used when the
+   OSI website is unreachable. Review annually or when
+   OSI approves/revokes license categories.
+
+2. **Compatibility Tier Table**: Maps SPDX identifiers
+   to permissive/weak-copyleft/strong-copyleft tiers.
+   Review annually or when new copyleft licenses gain
+   significant adoption.
+
+Both structures are embedded in `pinkman.md`, which is
+**user-owned** (not overwritten by `uf init`). Updates
+to the canonical scaffold copy do not propagate to
+existing deployments automatically. Users must manually
+update their `pinkman.md` or re-scaffold.
+
+A review date marker is embedded as an HTML comment in
+the tier table. The first review is due 2027-04-25.
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: Users can discover license-compatible open
-  source projects for a given domain keyword within 60
-  seconds of invoking Pinkman.
+  source projects for a given domain keyword. First
+  results appear within 60 seconds under normal network
+  conditions; complete results may take longer depending
+  on result count, network conditions, and rate limiting.
 - **SC-002**: 100% of projects in Pinkman's "compatible"
   results have licenses verified as OSI-approved --
   zero false positives for license compatibility.

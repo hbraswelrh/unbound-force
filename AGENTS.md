@@ -123,6 +123,14 @@ model from OpenCode's own configuration hierarchy: project-level
 Subagents inherit from their invoking primary agent. To change the
 model for all agents, set the `"model"` field in `opencode.json`.
 
+### Utility Agents (Non-Hero)
+
+| Agent | Role | File | Status |
+|-------|------|------|--------|
+| Pinkman | OSS Scout — discovers license-compatible projects, tracks industry trends, audits dependency health | `.opencode/agents/pinkman.md` | Implemented (Spec 032) |
+
+Pinkman is the OSS Scout — a non-hero utility agent that discovers, evaluates, and reports on open source projects. It operates in four modes (discover, trend, audit, report) with license compatibility classification (permissive/weak-copyleft/strong-copyleft) and human-in-the-loop approval for non-permissive licenses. Invoked via `/scout`.
+
 ## Project Structure
 
 ```text
@@ -160,6 +168,7 @@ unbound-force/
 │   │   ├── divisor-envoy.md         # The Envoy: PR/communications (Divisor)
 │   │   ├── gaze-reporter.md         # Gaze report agent
 │   │   ├── muti-mind-po.md          # Muti-Mind Product Owner agent
+│   │   └── pinkman.md               # OSS Scout agent (Spec 032)
 │   │   ├── reviewer-adversary.md    # Legacy reviewer (superseded by divisor-*)
 │   │   ├── reviewer-architect.md    # Legacy reviewer (superseded by divisor-*)
 │   │   ├── reviewer-guard.md        # Legacy reviewer (superseded by divisor-*)
@@ -177,6 +186,7 @@ unbound-force/
 │   │   ├── speckit.taskstoissues.md
 │   │   ├── agent-brief.md            # /agent-brief command (AGENTS.md lifecycle)
 │   │   ├── review-council.md        # /review-council command (Divisor)
+│   │   ├── scout.md                 # /scout OSS scouting command (Spec 032)
 │   │   ├── constitution-check.md    # /constitution-check command
 │   │   ├── unleash.md               # /unleash autonomous pipeline (Spec 018)
 │   │   ├── workflow-start.md        # /workflow start command (Spec 008)
@@ -827,6 +837,7 @@ without exception.
 
 ## Recent Changes
 
+- 032-pinkman-oss-scout: Added Pinkman OSS Scout agent (`pinkman.md`) and `/scout` slash command (`scout.md`) for open source project discovery, trend tracking, dependency auditing, and adoption recommendations. Four operating modes (discover, trend, audit, report) with license classification against the OSI-approved list, license compatibility tiers (permissive/weak-copyleft/strong-copyleft) with Apache-2.0 compatibility verdicts (compatible/caution/incompatible), compatibility-gated recommendation verdicts, human-in-the-loop approval for non-permissive licenses, URL validation, request pacing, Dewey integration with mode-specific tags (`pinkman-discover/trend/audit/report`) and structured prose templates, and report persistence at `.uf/pinkman/reports/`. Non-hero utility agent — does not prioritize, integrate, test, review, or coach. Invoked via `/scout`. 2 scaffold assets added (35 → 37 files). All 4 user stories and 33 tasks completed.
 - opsx/pinkman-license-compatibility: Added license compatibility classification to Pinkman's License Classification procedure. Layered a permissive/weak-copyleft/strong-copyleft tier on top of the existing OSI-approved check, with a compatibility verdict (compatible/caution/incompatible) relative to the project's Apache-2.0 license. Strong-copyleft projects (GPL, AGPL) now receive `incompatible` verdict and are capped at `avoid` regardless of health signals. Weak-copyleft (LGPL, MPL-2.0, EPL-2.0) receive `caution` and are capped at `evaluate`. Permissive licenses (MIT, Apache-2.0, BSD, ISC) receive `compatible` with no recommendation cap. Updated fallback license list with tier annotations grouped by category. Updated all output formats (Discover/Trend, Audit, Recommendation Report) with compatibility tier and verdict fields. Updated Dewey learning structured prose to include compatibility verdicts. Added dual-license compatibility rule (use most favorable tier from SPDX OR expression). No hero agent files modified. No schema registry changes. No Go code changes. 18 tasks completed.
 - opsx/pinkman-dewey-enrichment: Enriched Pinkman's Dewey learning storage with mode-specific tags and structured content conventions for cross-hero discoverability. Replaced flat `pinkman` tag with mode-specific tags (`pinkman-discover`, `pinkman-trend`, `pinkman-audit`, `pinkman-report`) -- hyphen-separated because `dewey_store_learning` strips `/` from tag values. Added content prefix convention (`scouting-report:`, `trend-report:`, `dependency-audit:`, `adoption-report:`) and structured prose templates with required fields per mode. Added explicit Dewey storage steps to Trend, Audit, and Report mode sections (Discover already had one). Documented that `dewey_find_by_tag` does not search learning tag properties -- primary discovery path is `dewey_semantic_search` with `dewey_semantic_search_filtered(has_tag: ...)` for filtered queries. Added API parameter reference noting live tool uses `information`/`tag` (not Spec 021's `text`/`tags`). No hero agent files modified. No schema registry changes. No Go code changes. Agent-only Markdown change to `.opencode/agents/pinkman.md` and its scaffold copy. 10 tasks completed.
 - opsx/agent-brief-command: Added `/agent-brief` slash command for AGENTS.md lifecycle management (create, audit, improve). The command auto-detects mode: creates AGENTS.md from project analysis when none exists (hybrid template + LLM approach filling Tier 1 sections from go.mod/package.json, Makefile, CI config, README), or audits existing files against a context-sensitive section taxonomy with scoring (Excellent/Strong/Adequate/Weak/Missing). Context-sensitive Tier 1C sections (Constitution, Spec Framework) are generated or checked only when `.specify/memory/constitution.md`, `specs/`, or `openspec/` are detected. Cross-framework governance bridge check verifies the constitution is stated as governing both Speckit and OpenSpec when both frameworks exist. Bridge file handling ensures CLAUDE.md (`@AGENTS.md` import) and .cursorrules exist. New "Agent Context" doctor check group replaces the single AGENTS.md existence check with 12 deterministic structural checks: file existence, 5 Tier 1 section headers (Project Overview, Build Commands, Project Structure, Code Conventions, Technology Stack), build section code blocks, line count (warn >300), constitution reference (context-sensitive), spec framework description (context-sensitive), CLAUDE.md bridge, .cursorrules bridge. InstallHint changed from "Run: uf init" to "Run: /agent-brief in OpenCode". Scaffold asset distributed via `uf init`. New file: `.opencode/command/agent-brief.md`. Modified files: `internal/doctor/checks.go`, `internal/doctor/doctor.go`, `internal/doctor/doctor_test.go`, `internal/scaffold/scaffold_test.go`. Added 12 new doctor test functions and updated 3 existing tests. All 7 task groups and 51 tasks completed.
