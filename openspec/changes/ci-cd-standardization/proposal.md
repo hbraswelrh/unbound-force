@@ -3,7 +3,8 @@
 unbound-force currently has 3 CI/CD workflows (`test.yml`,
 `release.yml`, `ci_crapload.yml`) while the complytime
 organization's standard -- established in `org-infra` and
-adopted by `complyctl` -- provides 9 reusable workflows.
+adopted by `complyctl` -- provides 13 reusable workflows
+(9 applicable to non-container projects).
 unbound-force consumes only 1 of them (CRAP load analysis).
 
 Key gaps identified through analysis of `complyctl` and
@@ -63,6 +64,15 @@ standardize all workflows to match the org-infra pattern.
 - `govulncheck || true` step: Removed from test workflow.
   Non-blocking vulnerability scanning is replaced by
   properly blocking OSV-Scanner + Trivy in ci_security.
+  **Gatekeeping note**: AGENTS.md §Gatekeeping Value
+  Protection lists `govulncheck` as a protected CI flag.
+  However, the existing `govulncheck || true` was never
+  a functional gate (the `|| true` ensured it always
+  passed). This removal is authorized by human decision
+  during the explore session. AGENTS.md item 4 will be
+  updated to replace `govulncheck` with `OSV-Scanner`
+  and `Trivy` as the protected vulnerability scanning
+  tools.
 - Inline golangci-lint step: Removed from test workflow.
   Go linting is handled by MegaLinter in ci_checks.
 
@@ -81,6 +91,7 @@ standardize all workflows to match the org-infra pattern.
 - `.github/workflows/release.yml`
 - `.github/workflows/ci_crapload.yml`
 - `.github/settings.yml`
+- `AGENTS.md` (Gatekeeping Value Protection item 4)
 
 **External dependencies:**
 - All new workflows consume reusable workflows from
@@ -148,5 +159,8 @@ flags and coverage ratchet enforcement. No test
 infrastructure is removed. The change does not affect
 the project's test isolation properties. CI workflow
 files themselves are validated by actionlint (via
-MegaLinter). All workflows can be tested via
-`act` or manual `workflow_dispatch` where applicable.
+MegaLinter). This change produces no new Go code, so
+the traditional coverage strategy (unit/integration/e2e
+with specific targets) is N/A. Verification is handled
+through automated workflow syntax validation (actionlint)
+and the manual verification checklist in tasks.md.
