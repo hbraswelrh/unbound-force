@@ -163,9 +163,3 @@ Pinkman scouts the open source landscape so the team adopts the right tools earl
 Pinkman operates in four modes: **discover** (search for projects by keyword), **trend** (track trending projects in a category), **audit** (check existing dependencies for updates and license changes), and **report** (generate a full adoption recommendation for a specific project). Every scouted project is classified against the OSI-approved license list and assessed for compatibility with the ecosystem's Apache-2.0 license. Non-permissive licenses require explicit human approval before inclusion in results.
 
 Pinkman feeds upstream into the hero pipeline: Pinkman scouts, Muti-Mind prioritizes, Cobalt-Crush integrates, Gaze tests, The Divisor reviews, and Mx F coaches. Invoked via `/scout`.
-
-### Onboarding Guide
-
-**Focus:** *User Profile Capture and Hero Routing*
-
-The Onboarding Guide captures the user's inspiration, interests, and objectives through a structured interview and produces a profile that heroes use to contextualize their decisions. It routes users to the appropriate heroes based on their stated goals. Invoked via `/onboard`.
