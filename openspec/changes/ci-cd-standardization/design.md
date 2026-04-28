@@ -90,14 +90,23 @@ security as SHA-pinned actions.
 
 ### D3: MegaLinter linter selection
 
-Start with a focused set of 4 linters:
+Start with a focused set of 3 linters and 1 scanner:
 
-| Linter | Purpose |
-|---|---|
-| `GO_GOLANGCI_LINT` | Go linting (uses `.golangci.yml`) |
-| `ACTION_ACTIONLINT` | GitHub Actions workflow validation |
-| `BASH_SHELLCHECK` | Bash script quality |
-| `REPOSITORY_GITLEAKS` | Secret detection |
+| Tool | Category | Purpose |
+|---|---|---|
+| `GO_GOLANGCI_LINT` | Linter | Go linting (uses `.golangci.yml`) |
+| `ACTION_ACTIONLINT` | Linter | GitHub Actions workflow validation |
+| `BASH_SHELLCHECK` | Linter | Bash script quality |
+| `REPOSITORY_GITLEAKS` | Scanner | Secret detection in source |
+
+Note: Gitleaks (`REPOSITORY_GITLEAKS`) is a secret
+scanner, not a code quality linter. MegaLinter runs it
+through its unified framework under the `REPOSITORY`
+descriptor category. Gitleaks and Trivy source scan
+(in `ci_security`) both detect secrets -- this overlap
+is intentional defense-in-depth. Gitleaks runs on every
+PR (fast, pattern-based), while Trivy provides broader
+coverage including misconfiguration and IaC scanning.
 
 Markdown and YAML linters are commented out initially.
 The repo has 100+ Markdown files (specs, agents,
@@ -156,14 +165,26 @@ Release workflows must never be cancelled mid-execution.
 
 ### D6: Dependabot auto-approval criteria
 
-Matches the org standard from complyctl:
+Auto-approval uses `github.rest.pulls.createReview` with
+`event: 'APPROVE'` to submit a GitHub PR review with
+"approve" disposition. This does NOT merge the PR -- it
+only adds a review approval. The PR still requires all
+other status checks to pass and any merge rules (e.g.,
+required reviewers) to be satisfied before merging.
+
+The auto-approve job requires `pull-requests: write`
+permission at job level (the top-level default is
+`pull-requests: none`). This uses the workflow's
+`GITHUB_TOKEN`, which is sufficient for submitting PR
+reviews in the same repository.
+
+Approval criteria (all four must be met):
 - Risk level is not `high` (non-major updates)
 - Dependency review passes (no known vulnerabilities)
 - Release age >= 24 hours (avoids supply chain attacks)
 - Release age is known (not `-1`)
 
-All four criteria must be met. If any fails, the PR
-requires manual review.
+If any criterion fails, the PR requires manual review.
 
 **Rationale**: The 24-hour release age window is a
 supply chain defense. Newly-published malicious packages
@@ -192,6 +213,45 @@ misconfiguration scanning. Scorecards track the project's
 overall supply chain security posture. The `|| true`
 on govulncheck means it was never actually blocking --
 these replacements are properly blocking.
+
+### D8: Third-party action SHAs
+
+All third-party actions used in workflows MUST be
+SHA-pinned with a version comment. The specific SHAs
+for actions used in `ci_dependencies.yml`:
+
+| Action | SHA | Version |
+|---|---|---|
+| `peter-evans/create-or-update-comment` | `e8674b075228eee787fea43ef493e45ece1004c9` | v5.0.0 |
+| `actions/github-script` | `3a2844b7e9c422d3c10d287c895573f7108da1b3` | v9.0.0 |
+
+These match the SHAs used in complyctl's
+`ci_dependencies.yml` and org-infra's own workflows.
+
+### D9: Release workflow permission refactoring
+
+When changing `release.yml` top-level permissions to
+`permissions: {}` (empty/none), each job must declare
+its own permissions explicitly:
+
+| Job | Required Permissions |
+|---|---|
+| `release` | `contents: write` (create releases, upload assets) |
+| `sign-macos` | `contents: write` (download/upload release assets) |
+
+Both jobs use `GITHUB_TOKEN` for release asset operations
+and `HOMEBREW_TAP_TOKEN` for cross-repo tap updates. The
+`HOMEBREW_TAP_TOKEN` is a repository secret (PAT), not
+affected by workflow permissions.
+
+### D10: Scheduled workflow branch scope
+
+Scheduled workflows (`ci_scheduled.yml`) always run
+against the repository's default branch (main). This is
+a GitHub Actions platform constraint, not a configuration
+choice. The scheduled scan does NOT cover feature branches
+-- it monitors the production codebase for newly-disclosed
+vulnerabilities in already-merged dependencies.
 
 ## Risks / Trade-offs
 

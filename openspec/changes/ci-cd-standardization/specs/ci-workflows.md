@@ -9,6 +9,11 @@ MUST additionally run the dependabot reviewer workflow,
 post a structured review comment, and conditionally
 auto-approve the PR.
 
+Auto-approval submits a GitHub PR review with `APPROVE`
+disposition via `github.rest.pulls.createReview`. It
+MUST NOT merge the PR directly. The auto-approve job
+MUST have `pull-requests: write` at job level.
+
 Auto-approval MUST require all four criteria:
 - Risk level is not `high`
 - Dependency review conclusion is `success`
