@@ -128,6 +128,7 @@ var expectedAssetPaths = []string{
 	"opencode/command/constitution-check.md",
 	"opencode/command/finale.md",
 	"opencode/command/review-council.md",
+	"opencode/command/review-pr.md",
 	"opencode/command/scout.md",
 	"opencode/command/uf-init.md",
 	"opencode/command/unleash.md",
