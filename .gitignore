@@ -50,8 +50,8 @@ dist/
 .uf/muti-mind/artifacts/
 # Mx F runtime metrics data
 .uf/mx-f/data/
-# Pinkman scouting reports (runtime data)
-.uf/pinkman/reports/
+# Snoopy scouting reports (runtime data)
+.uf/snoopy/reports/
 
 # Unbound Force — managed by uf init
 # Runtime data under .uf/ (databases, caches, locks, logs)
@@ -69,7 +69,7 @@ dist/
 .uf/replicator/*.lock
 .uf/muti-mind/artifacts/
 .uf/mx-f/data/
-.uf/pinkman/reports/
+.uf/snoopy/reports/
 # Legacy tool directories (renamed to .uf/ in Spec 025)
 .dewey/
 .hive/

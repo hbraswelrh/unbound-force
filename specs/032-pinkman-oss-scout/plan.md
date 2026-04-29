@@ -1,11 +1,11 @@
-# Implementation Plan: Pinkman OSS Scout
+# Implementation Plan: Snoopy OSS Scout
 
-**Branch**: `032-pinkman-oss-scout` | **Date**: 2026-04-22 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `specs/032-pinkman-oss-scout/spec.md`
+**Branch**: `032-snoopy-oss-scout` | **Date**: 2026-04-22 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `specs/032-snoopy-oss-scout/spec.md`
 
 ## Summary
 
-Pinkman is a non-hero utility agent that discovers open
+Snoopy is a non-hero utility agent that discovers open
 source projects by domain keyword, classifies their
 licenses against the OSI-approved list, lists direct
 dependencies with overlap detection across results,
@@ -14,7 +14,7 @@ dependency health, and generates structured adoption
 recommendation reports. It is implemented as an OpenCode
 agent file with a `/scout` slash command, following the
 established agent + command pattern (Specs 006, 007,
-031). Pinkman uses `webfetch` for public data retrieval
+031). Snoopy uses `webfetch` for public data retrieval
 and Dewey for persistent scouting memory.
 
 ## Technical Context
@@ -28,7 +28,7 @@ and test updates only)
 report generation), Dewey MCP tools (optional -- for
 persistent scouting memory)
 **Storage**: Scouting results stored as Markdown files
-with YAML frontmatter at `.uf/pinkman/reports/` for
+with YAML frontmatter at `.uf/snoopy/reports/` for
 local persistence. Optionally stored in Dewey knowledge
 graph via `dewey_store_learning` for cross-session
 retrieval.
@@ -57,7 +57,7 @@ after Phase 1 design.*
 
 ### I. Autonomous Collaboration — PASS
 
-Pinkman produces self-describing artifacts (scouting
+Snoopy produces self-describing artifacts (scouting
 reports with metadata: producer identity, version,
 timestamp, artifact type) per the artifact envelope
 format. It does not require synchronous interaction
@@ -66,11 +66,11 @@ input -- it reads only public data sources and local
 dependency manifests. Its outputs can be consumed by
 Muti-Mind (for adoption prioritization), Cobalt-Crush
 (for adoption implementation), and Mx F (for dependency
-health metrics) without requiring Pinkman to be present.
+health metrics) without requiring Snoopy to be present.
 
 ### II. Composability First — PASS
 
-Pinkman is independently installable and usable without
+Snoopy is independently installable and usable without
 any other hero. It delivers its core value (OSS
 discovery and license checking) when deployed alone. It
 exposes extension points: Dewey integration is optional
@@ -79,19 +79,19 @@ format uses the standard artifact envelope for
 inter-hero consumption. It does not require any hero as
 a prerequisite. When deployed alongside other heroes, it
 produces additive value (e.g., Muti-Mind can prioritize
-adoption candidates from Pinkman's reports).
+adoption candidates from Snoopy's reports).
 
 ### III. Observable Quality — PASS
 
-All Pinkman outputs are structured Markdown with YAML
+All Snoopy outputs are structured Markdown with YAML
 frontmatter (machine-parseable). Reports include
-provenance metadata (producer: pinkman, version,
+provenance metadata (producer: snoopy, version,
 timestamp, query context). License verdicts reference
 the OSI-approved list with SPDX identifiers. Trend
 indicators are quantitative and comparable across runs.
 Quality claims (SC-002: zero false positives for license
 compatibility) are verifiable through automated tests
-that compare Pinkman's license verdicts against the
+that compare Snoopy's license verdicts against the
 canonical OSI list.
 
 ### IV. Testability — PASS
@@ -117,7 +117,7 @@ entries needed.
 ### Documentation (this feature)
 
 ```text
-specs/032-pinkman-oss-scout/
+specs/032-snoopy-oss-scout/
 ├── spec.md              # Feature specification
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output
@@ -135,7 +135,7 @@ specs/032-pinkman-oss-scout/
 # Agent and command files (deployed by uf init)
 .opencode/
 ├── agents/
-│   └── pinkman.md               # Pinkman agent file (user-owned)
+│   └── snoopy.md               # Snoopy agent file (user-owned)
 └── command/
     └── scout.md                 # /scout slash command (tool-owned)
 
@@ -143,12 +143,12 @@ specs/032-pinkman-oss-scout/
 internal/scaffold/assets/
 ├── opencode/
 │   ├── agents/
-│   │   └── pinkman.md           # Embedded copy of agent
+│   │   └── snoopy.md           # Embedded copy of agent
 │   └── command/
 │       └── scout.md             # Embedded copy of command
 
 # Local storage (runtime data, gitignored)
-.uf/pinkman/
+.uf/snoopy/
 └── reports/                     # Scouting report artifacts
     └── YYYY-MM-DDTHH-MM-SS-<query>.md
 ```
@@ -156,7 +156,7 @@ internal/scaffold/assets/
 **Structure Decision**: Single-project layout with two
 new Markdown files (agent + command) deployed through
 the existing scaffold engine pattern. No new Go packages
-needed -- Pinkman's logic is expressed entirely in agent
+needed -- Snoopy's logic is expressed entirely in agent
 instructions. Local report storage follows the `.uf/`
 convention (Spec 025). The scaffold engine's `fs.WalkDir`
 automatically picks up new files under
@@ -166,19 +166,19 @@ automatically picks up new files under
 
 ### D1: Agent-Only Implementation (No Go CLI Backend)
 
-Pinkman is implemented entirely as an OpenCode agent
+Snoopy is implemented entirely as an OpenCode agent
 file + slash command, with no Go CLI backend package.
 The agent uses `webfetch` for data retrieval and
 `read`/`write` for file operations.
 
-**Rationale**: Pinkman's core operations (web scraping,
+**Rationale**: Snoopy's core operations (web scraping,
 license lookup, trend analysis, report generation) are
 inherently AI reasoning tasks that benefit from the
 agent's language understanding capabilities. A Go CLI
 backend would add complexity without significant value
 -- unlike Muti-Mind (which needs structured backlog
 parsing) or Mx F (which needs metrics aggregation),
-Pinkman's operations are better suited to the agent
+Snoopy's operations are better suited to the agent
 runtime. This also keeps the implementation scope small
 (2 Markdown files vs. a full Go package).
 
@@ -189,7 +189,7 @@ list from opensource.org at invocation time rather than
 maintaining a static embedded list.
 
 **Rationale**: The OSI list is the authoritative source
-per FR-003. Fetching it live ensures Pinkman always
+per FR-003. Fetching it live ensures Snoopy always
 uses the current list without requiring agent file
 updates when OSI approves new licenses. Graceful
 degradation: if the OSI site is unreachable, the agent
@@ -216,7 +216,7 @@ results when throttled (FR-012).
 ### D4: Report Storage and Dewey Integration
 
 Reports are persisted locally as Markdown files at
-`.uf/pinkman/reports/` and optionally stored in Dewey
+`.uf/snoopy/reports/` and optionally stored in Dewey
 via `dewey_store_learning` for cross-session retrieval.
 
 **Rationale**: Local file storage ensures reports are
@@ -244,7 +244,7 @@ pass.
 
 ### D6: File Ownership Model
 
-- `pinkman.md` (agent file): **user-owned** -- allows
+- `snoopy.md` (agent file): **user-owned** -- allows
   users to customize scouting behavior, data sources,
   and report format.
 - `scout.md` (command file): **tool-owned** -- ensures
@@ -261,13 +261,13 @@ for the command ensures consistent invocation.
 
 ### Unit Tests (Go)
 - Scaffold drift detection: embedded asset at
-  `internal/scaffold/assets/opencode/agents/pinkman.md`
-  must match canonical `.opencode/agents/pinkman.md`
+  `internal/scaffold/assets/opencode/agents/snoopy.md`
+  must match canonical `.opencode/agents/snoopy.md`
 - Scaffold drift detection: embedded asset at
   `internal/scaffold/assets/opencode/command/scout.md`
   must match canonical `.opencode/command/scout.md`
 - `expectedAssetPaths` count updated (35 → 37)
-- `isToolOwned` returns false for `pinkman.md`, true
+- `isToolOwned` returns false for `snoopy.md`, true
   for `scout.md`
 
 ### Integration Tests (Manual)
@@ -282,7 +282,7 @@ for the command ensures consistent invocation.
   - Maintenance risk flags present where applicable
 - Invoke `/scout --report <project-url>` and verify:
   - Report contains all required sections
-  - Report stored at `.uf/pinkman/reports/`
+  - Report stored at `.uf/snoopy/reports/`
   - Report can be stored in Dewey (if available)
 
 ### Acceptance Tests (Per Spec)

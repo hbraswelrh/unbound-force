@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Pinkman OSS Scout
+# Specification Quality Checklist: Snoopy OSS Scout
 
 **Purpose**: Validate specification completeness and
 quality before proceeding to planning
@@ -45,7 +45,7 @@ quality before proceeding to planning
     added (user addition, FR-014/015/016)
   - Shared dependency license checking deferred to
     future enhancement (clarification Q1 → answer B)
-- Pinkman classified as non-hero utility agent
+- Snoopy classified as non-hero utility agent
   (matching the onboarding agent pattern) to keep
   initial scope manageable
 - Public data sources assumed (no paid/proprietary

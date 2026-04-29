@@ -1,5 +1,5 @@
 ---
-description: Invoke Pinkman OSS Scout to discover, trend-scan, audit, or report on open source projects.
+description: Invoke Snoopy OSS Scout to discover, trend-scan, audit, or report on open source projects.
 ---
 <!-- scaffolded by uf vdev -->
 
@@ -13,7 +13,7 @@ $ARGUMENTS
 
 ## Description
 
-Invoke Pinkman to scout open source projects. Pinkman
+Invoke Snoopy to scout open source projects. Snoopy
 discovers projects by domain keyword, classifies
 licenses against the OSI-approved list, lists direct
 dependencies with overlap detection, tracks industry
@@ -45,8 +45,8 @@ structured adoption recommendation reports.
    - Otherwise: treat the entire `$ARGUMENTS` as the
      domain keyword and set mode to `discover`.
 
-2. **Delegate to the Pinkman agent** using the Task tool
-   with `subagent_type: "pinkman"`.
+2. **Delegate to the Snoopy agent** using the Task tool
+   with `subagent_type: "snoopy"`.
 
 3. **Construct the prompt** for the agent:
 
@@ -57,7 +57,7 @@ structured adoption recommendation reports.
    > the OSI-approved list, list direct dependencies,
    > detect shared dependency overlaps, and present
    > results in the standard output format. Save the
-   > report to .uf/pinkman/reports/."
+   > report to .uf/snoopy/reports/."
 
    For **trend** mode:
    > "Find trending open source projects in the
@@ -66,7 +66,7 @@ structured adoption recommendation reports.
    > trend indicators (star growth, release velocity,
    > contributor activity), classify licenses, and rank
    > by trend strength. Save the report to
-   > .uf/pinkman/reports/."
+   > .uf/snoopy/reports/."
 
    For **audit** mode:
    > "Audit the dependencies in <manifest-path>. Use
@@ -74,7 +74,7 @@ structured adoption recommendation reports.
    > dependency for available updates, detect license
    > changes between versions, assess maintenance risk,
    > and present results in the audit table format. Save
-   > the report to .uf/pinkman/reports/."
+   > the report to .uf/snoopy/reports/."
 
    For **report** mode:
    > "Generate an adoption recommendation report for
@@ -83,7 +83,7 @@ structured adoption recommendation reports.
    > trends, maintenance, dependencies, and produce a
    > structured recommendation with a verdict (adopt /
    > evaluate / defer / avoid). Save the report to
-   > .uf/pinkman/reports/."
+   > .uf/snoopy/reports/."
 
-4. **Return the result** from the Pinkman agent to the
+4. **Return the result** from the Snoopy agent to the
    user.

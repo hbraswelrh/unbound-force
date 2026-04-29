@@ -1,10 +1,10 @@
-# Feature Specification: Pinkman OSS Scout
+# Feature Specification: Snoopy OSS Scout
 
-**Feature Branch**: `032-pinkman-oss-scout`
+**Feature Branch**: `032-snoopy-oss-scout`
 **Created**: 2026-04-22
 **Status**: Complete
 **Input**: User description: "Create an agent that is
-called pinkman that will retrieve new or update open
+called snoopy that will retrieve new or update open
 source projects that track with industry trends and are
 compatible with the open source licensing within the
 unbound-force project. Do not replicate any of the
@@ -14,7 +14,7 @@ existing agentic capabilities within unbound-force."
 
 ### Session 2026-04-22
 
-- Q: Should Pinkman check shared dependencies for
+- Q: Should Snoopy check shared dependencies for
   OSI-approved licenses (one level deep)? → A: No --
   list overlaps only, do not check shared dependency
   licenses (defer to future enhancement).
@@ -25,12 +25,12 @@ existing agentic capabilities within unbound-force."
 
 An engineer working on the Unbound Force ecosystem wants
 to find new open source projects that could benefit
-their work. They invoke Pinkman, which scans public
+their work. They invoke Snoopy, which scans public
 sources for open source projects relevant to their
 domain (AI agent tooling, developer infrastructure,
 static analysis, CLI frameworks, etc.) and filters
 results to only those with Open Source Initiative (OSI)
-approved licenses. For each suggested project, Pinkman
+approved licenses. For each suggested project, Snoopy
 lists that project's direct dependencies and highlights
 any dependencies shared across multiple suggested
 projects, giving the engineer visibility into supply
@@ -42,12 +42,12 @@ manual research.
 
 **Why this priority**: License compatibility is the
 non-negotiable prerequisite for any OSS adoption.
-Without this capability, all other Pinkman features are
+Without this capability, all other Snoopy features are
 moot -- an incompatible project cannot be adopted
 regardless of how trendy or useful it is.
 
 **Independent Test**: Can be fully tested by invoking
-Pinkman with a domain keyword (e.g., "static analysis
+Snoopy with a domain keyword (e.g., "static analysis
 Go") and verifying it returns a list of projects that
 all carry OSI-approved licenses, with no non-approved
 or proprietary projects in the results, and each result
@@ -56,20 +56,20 @@ includes a list of its direct dependencies.
 **Acceptance Scenarios**:
 
 1. **Given** the Unbound Force project uses Apache 2.0
-   licensing, **When** Pinkman is asked to find projects
+   licensing, **When** Snoopy is asked to find projects
    for a given domain keyword, **Then** it returns only
    projects whose licenses appear on the OSI-approved
    license list.
 2. **Given** a search returns projects with mixed
-   licensing, **When** Pinkman filters results, **Then**
+   licensing, **When** Snoopy filters results, **Then**
    projects with non-OSI-approved licenses are excluded
    from the primary results and flagged separately with
    an explanation of why the license is not OSI-approved.
 3. **Given** a project has no detectable license,
-   **When** Pinkman encounters it, **Then** it is flagged
+   **When** Snoopy encounters it, **Then** it is flagged
    as "license unknown -- manual review required" and
    excluded from the compatible results list.
-4. **Given** Pinkman returns multiple suggested projects,
+4. **Given** Snoopy returns multiple suggested projects,
    **When** the results are presented, **Then** each
    project includes a list of its direct dependencies,
    and dependencies that appear in more than one
@@ -83,21 +83,21 @@ includes a list of its direct dependencies.
 
 An engineer wants to stay current with industry trends
 in open source tooling relevant to the Unbound Force
-ecosystem. They invoke Pinkman to identify trending
+ecosystem. They invoke Snoopy to identify trending
 projects -- those gaining significant community traction
 (stars, forks, contributor growth, release velocity) --
-within relevant categories. Pinkman surfaces projects
+within relevant categories. Snoopy surfaces projects
 that are both trending and license-compatible, helping
 the team proactively adopt valuable tools before they
 become industry defaults.
 
-**Why this priority**: Trend tracking transforms Pinkman
+**Why this priority**: Trend tracking transforms Snoopy
 from a reactive search tool into a proactive advisor.
 Once license compatibility is established (P1), trend
 awareness lets the team identify high-value adoption
 candidates early, gaining competitive advantage.
 
-**Independent Test**: Can be tested by invoking Pinkman
+**Independent Test**: Can be tested by invoking Snoopy
 in trend-scanning mode for a category (e.g., "MCP
 servers") and verifying it returns projects sorted by
 trend signals with quantitative indicators (growth
@@ -106,18 +106,18 @@ rate, community activity metrics).
 **Acceptance Scenarios**:
 
 1. **Given** the engineer requests trending projects in a
-   category, **When** Pinkman analyzes public project
+   category, **When** Snoopy analyzes public project
    data, **Then** it returns projects ranked by trend
    strength with at least three quantitative indicators
    (e.g., star growth rate, fork count trajectory,
    release frequency).
 2. **Given** a project is trending but has a non-OSI-approved
-   license, **When** Pinkman presents results, **Then**
+   license, **When** Snoopy presents results, **Then**
    that project appears in a separate "trending but
    not OSI-approved" section with the license issue
    explained.
 3. **Given** no projects are trending in the requested
-   category, **When** Pinkman completes its scan,
+   category, **When** Snoopy completes its scan,
    **Then** it reports "no significant trends detected"
    with the date range and sources consulted.
 
@@ -129,7 +129,7 @@ An engineer wants to know when existing open source
 dependencies used by the Unbound Force ecosystem have
 significant updates -- new major versions, security
 patches, deprecation notices, or maintainer changes that
-could affect project health. They invoke Pinkman to
+could affect project health. They invoke Snoopy to
 audit current dependencies and report actionable
 findings, such as available updates, end-of-life
 warnings, or license changes in newer versions.
@@ -138,12 +138,12 @@ warnings, or license changes in newer versions.
 is essential for ongoing project health but is lower
 priority than new discovery (P1) and trend tracking
 (P2) because existing dependencies are already known
-and managed through standard tooling. Pinkman adds
+and managed through standard tooling. Snoopy adds
 value here by surfacing higher-level signals (license
 changes, maintainer health, deprecation risk) that
 standard dependency update tools do not catch.
 
-**Independent Test**: Can be tested by pointing Pinkman
+**Independent Test**: Can be tested by pointing Snoopy
 at a project's dependency manifest (e.g., `go.mod`) and
 verifying it identifies at least one dependency with an
 available update and correctly reports its current vs.
@@ -153,20 +153,20 @@ health indicators.
 **Acceptance Scenarios**:
 
 1. **Given** a project dependency manifest exists,
-   **When** Pinkman audits dependencies, **Then** it
+   **When** Snoopy audits dependencies, **Then** it
    reports each dependency's current version, latest
    available version, and whether the license has changed
    between versions.
 2. **Given** a dependency has changed its license in a
    newer version to a non-OSI-approved license,
-   **When** Pinkman reports the update, **Then** it
+   **When** Snoopy reports the update, **Then** it
    prominently warns about the license change and
    recommends staying on the current version or finding
    an alternative.
 3. **Given** a dependency shows signs of reduced
    maintenance (no commits in 12+ months, unresolved
    critical issues, archived repository), **When**
-   Pinkman audits it, **Then** it flags the dependency
+   Snoopy audits it, **Then** it flags the dependency
    as "maintenance risk" with the specific indicators.
 
 ---
@@ -174,7 +174,7 @@ health indicators.
 ### User Story 4 - Generate Adoption Recommendation Reports (Priority: P3)
 
 After discovery and trend analysis, an engineer wants
-Pinkman to produce a structured recommendation report
+Snoopy to produce a structured recommendation report
 for a specific project under consideration. The report
 summarizes license compatibility, community health,
 maintenance signals, trend trajectory, and how the
@@ -196,14 +196,14 @@ to existing dependencies) in a structured format.
 **Acceptance Scenarios**:
 
 1. **Given** an engineer requests a recommendation report
-   for a specific project, **When** Pinkman generates
+   for a specific project, **When** Snoopy generates
    the report, **Then** it includes sections for: license
    compatibility verdict (OSI-approved status), community
    health score, maintenance indicators, trend
    trajectory, direct dependency list, shared dependency
    overlap with other evaluated projects, and
    relationship to existing Unbound Force dependencies.
-2. **Given** Pinkman generates a report, **When** the
+2. **Given** Snoopy generates a report, **When** the
    report is complete, **Then** it is formatted as a
    structured artifact that can be stored in the
    knowledge graph via Dewey.
@@ -211,31 +211,31 @@ to existing dependencies) in a structured format.
 ### Edge Cases
 
 - What happens when a project uses a dual-license model
-  (e.g., MIT OR Apache-2.0)? Pinkman MUST evaluate each
+  (e.g., MIT OR Apache-2.0)? Snoopy MUST evaluate each
   license option and report compatibility based on the
   most favorable compatible option.
 - What happens when a project's license is a custom or
-  non-standard license? Pinkman MUST flag it as
+  non-standard license? Snoopy MUST flag it as
   "non-standard license -- manual legal review required"
   and exclude it from automatic compatibility verdicts.
 - What happens when public data sources are temporarily
-  unavailable? Pinkman MUST report which sources failed,
+  unavailable? Snoopy MUST report which sources failed,
   present partial results from available sources, and
   indicate the results are incomplete.
 - What happens when a dependency's repository has been
-  transferred to a new owner or organization? Pinkman
+  transferred to a new owner or organization? Snoopy
   MUST detect the transfer and report the ownership
   change as a risk signal.
 - What happens when the user requests scouting for a
-  domain with no relevant open source projects? Pinkman
+  domain with no relevant open source projects? Snoopy
   MUST report "no projects found" with the search
   criteria used, rather than returning unrelated results.
 - What happens when two suggested projects share a
-  dependency at conflicting versions? Pinkman MUST
+  dependency at conflicting versions? Snoopy MUST
   report the version discrepancy as a supply chain
   signal alongside the overlap indicator.
 - What happens when a scouted project has no declared
-  dependency manifest? Pinkman MUST report "dependencies
+  dependency manifest? Snoopy MUST report "dependencies
   unknown -- no manifest detected" and omit the project
   from overlap analysis.
 
@@ -243,64 +243,64 @@ to existing dependencies) in a structured format.
 
 ### Functional Requirements
 
-- **FR-001**: Pinkman MUST discover open source projects
+- **FR-001**: Snoopy MUST discover open source projects
   relevant to a user-specified domain or keyword query
   from public sources.
-- **FR-002**: Pinkman MUST determine the license of each
+- **FR-002**: Snoopy MUST determine the license of each
   discovered project and classify it as OSI-approved or
   not OSI-approved, using the Open Source Initiative's
   published list of approved licenses as the
   authoritative source.
-- **FR-003**: Pinkman MUST use the OSI-approved license
+- **FR-003**: Snoopy MUST use the OSI-approved license
   list (maintained by the Open Source Initiative at
   opensource.org) as the sole authority for license
   compatibility. A license is compatible if and only if
   it appears on the current OSI-approved list.
-- **FR-004**: Pinkman MUST quantify industry trend
+- **FR-004**: Snoopy MUST quantify industry trend
   signals for discovered projects using at least three
   measurable indicators (e.g., star growth rate, fork
   trajectory, release frequency, contributor growth).
-- **FR-005**: Pinkman MUST audit a project's dependency
+- **FR-005**: Snoopy MUST audit a project's dependency
   manifest to identify available updates for existing
   dependencies.
-- **FR-006**: Pinkman MUST detect license changes between
+- **FR-006**: Snoopy MUST detect license changes between
   the currently used version and the latest available
   version of a dependency.
-- **FR-014**: Pinkman MUST list the direct dependencies
+- **FR-014**: Snoopy MUST list the direct dependencies
   of each scouted project when a dependency manifest is
   available.
-- **FR-015**: Pinkman MUST identify and highlight
+- **FR-015**: Snoopy MUST identify and highlight
   dependencies that are shared across multiple scouted
   projects in a single result set, reporting the
   dependency name and the count of projects that use it.
 - **FR-016**: When shared dependencies appear at
-  conflicting versions across scouted projects, Pinkman
+  conflicting versions across scouted projects, Snoopy
   MUST report the version discrepancy as a supply chain
   signal.
-- **FR-007**: Pinkman MUST flag dependencies with
+- **FR-007**: Snoopy MUST flag dependencies with
   maintenance risk indicators (no commits in 12+ months,
   archived repository, unresolved critical issues).
-- **FR-008**: Pinkman MUST produce structured
+- **FR-008**: Snoopy MUST produce structured
   recommendation reports containing license analysis,
   community health, maintenance signals, trend data,
   and dependency relationships.
-- **FR-009**: Pinkman MUST NOT replicate capabilities of
+- **FR-009**: Snoopy MUST NOT replicate capabilities of
   existing Unbound Force heroes -- specifically: product
   backlog management (Muti-Mind), code implementation
   (Cobalt-Crush), testing and quality validation (Gaze),
   code review (The Divisor), or process coaching (Mx F).
-- **FR-010**: Pinkman MUST operate as a standalone agent
+- **FR-010**: Snoopy MUST operate as a standalone agent
   that produces self-describing artifacts, per the
   Autonomous Collaboration principle (Spec 001).
-- **FR-011**: Pinkman MUST handle dual-license projects
+- **FR-011**: Snoopy MUST handle dual-license projects
   by evaluating each license option against the
   OSI-approved list and reporting the most favorable
   approved option.
-- **FR-012**: Pinkman MUST gracefully handle unavailable
+- **FR-012**: Snoopy MUST gracefully handle unavailable
   data sources by reporting partial results with clear
   indication of which sources were consulted and which
   failed.
-- **FR-013**: Pinkman SHOULD integrate with the Dewey
+- **FR-013**: Snoopy SHOULD integrate with the Dewey
   knowledge layer to store and retrieve scouting
   results, enabling cross-session awareness of
   previously evaluated projects.
@@ -308,7 +308,7 @@ to existing dependencies) in a structured format.
 ### Key Entities
 
 - **Scouted Project**: An open source project discovered
-  by Pinkman. Key attributes: name, repository URL,
+  by Snoopy. Key attributes: name, repository URL,
   description, primary language, license identifier,
   OSI-approved verdict, trend indicators, community
   health metrics, direct dependency list, last updated
@@ -338,10 +338,10 @@ to existing dependencies) in a structured format.
 
 ### Dependencies
 
-- **Spec 001** (Org Constitution): Pinkman must adhere
+- **Spec 001** (Org Constitution): Snoopy must adhere
   to the four core principles (Autonomous Collaboration,
   Composability First, Observable Quality, Testability).
-- **Spec 002** (Hero Interface Contract): If Pinkman is
+- **Spec 002** (Hero Interface Contract): If Snoopy is
   implemented as a full hero, it must follow the
   standard hero repo structure and artifact envelope
   format.
@@ -349,7 +349,7 @@ to existing dependencies) in a structured format.
   reports should use the standard artifact envelope
   format for inter-hero consumption.
 - **Spec 014/015** (Dewey Architecture/Integration):
-  Pinkman's integration with the knowledge layer
+  Snoopy's integration with the knowledge layer
   depends on Dewey being available.
 
 ### Assumptions
@@ -358,7 +358,7 @@ to existing dependencies) in a structured format.
   is the authoritative reference for compatibility
   decisions. SPDX identifiers are used as the standard
   license identifier taxonomy for consistent naming.
-- Pinkman uses publicly available data sources (e.g.,
+- Snoopy uses publicly available data sources (e.g.,
   GitHub, package registries) for project discovery.
   No proprietary or paid data sources are required for
   the initial implementation.
@@ -370,9 +370,9 @@ to existing dependencies) in a structured format.
   out of scope for the initial version but may be
   added later.
 - Trend indicators are derived from publicly available
-  metrics. Pinkman does not perform sentiment analysis
+  metrics. Snoopy does not perform sentiment analysis
   on social media or news articles.
-- Pinkman is a non-hero utility agent (similar to the
+- Snoopy is a non-hero utility agent (similar to the
   onboarding agent) unless the team decides to elevate
   it to full hero status. This keeps the initial scope
   manageable.
@@ -399,7 +399,7 @@ to existing dependencies) in a structured format.
 - Automatic adoption or installation of discovered
   projects (that is Cobalt-Crush's domain)
 - Legal review or legal advice on license compatibility
-  (Pinkman provides technical classification, not legal
+  (Snoopy provides technical classification, not legal
   counsel)
 - Source code analysis of discovered projects (that is
   Gaze's domain)
@@ -417,7 +417,7 @@ to existing dependencies) in a structured format.
 
 ### Static Data Review
 
-The agent file (`pinkman.md`) contains two static data
+The agent file (`snoopy.md`) contains two static data
 structures that require periodic review:
 
 1. **Fallback License List** (26 SPDX identifiers): A
@@ -430,11 +430,11 @@ structures that require periodic review:
    Review annually or when new copyleft licenses gain
    significant adoption.
 
-Both structures are embedded in `pinkman.md`, which is
+Both structures are embedded in `snoopy.md`, which is
 **user-owned** (not overwritten by `uf init`). Updates
 to the canonical scaffold copy do not propagate to
 existing deployments automatically. Users must manually
-update their `pinkman.md` or re-scaffold.
+update their `snoopy.md` or re-scaffold.
 
 A review date marker is embedded as an HTML comment in
 the tier table. The first review is due 2027-04-25.
@@ -448,7 +448,7 @@ the tier table. The first review is due 2027-04-25.
   results appear within 60 seconds under normal network
   conditions; complete results may take longer depending
   on result count, network conditions, and rate limiting.
-- **SC-002**: 100% of projects in Pinkman's "compatible"
+- **SC-002**: 100% of projects in Snoopy's "compatible"
   results have licenses verified as OSI-approved --
   zero false positives for license compatibility.
 - **SC-003**: Trend analysis results include at least
@@ -464,7 +464,7 @@ the tier table. The first review is due 2027-04-25.
 - **SC-005a**: When multiple projects are scouted in a
   single invocation, 100% of shared dependencies are
   identified and reported with accurate overlap counts.
-- **SC-006**: Pinkman produces zero overlap with existing
+- **SC-006**: Snoopy produces zero overlap with existing
   hero capabilities -- validated by constitution check
   confirming no functional requirement duplicates an
   existing hero's responsibilities.

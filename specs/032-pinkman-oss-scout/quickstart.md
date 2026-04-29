@@ -1,10 +1,10 @@
-# Quickstart: Pinkman OSS Scout
+# Quickstart: Snoopy OSS Scout
 
 ## Prerequisites
 
 - OpenCode installed and configured
 - `uf init` has been run in the target repository
-  (deploys `pinkman.md` agent and `scout.md` command)
+  (deploys `snoopy.md` agent and `scout.md` command)
 
 ## Basic Usage
 
@@ -62,17 +62,17 @@ evaluate/defer/avoid recommendation.
 
 ## Report Storage
 
-Scouting reports are saved to `.uf/pinkman/reports/`.
+Scouting reports are saved to `.uf/snoopy/reports/`.
 When Dewey is available, results are also stored in the
 knowledge graph for cross-session search.
 
 ## Customization
 
-The `pinkman.md` agent file is user-owned. You can
+The `snoopy.md` agent file is user-owned. You can
 customize:
 - Default data sources and search behavior
 - Report format and sections
 - Domain keywords and category lists
 - Trend indicator thresholds
 
-Edit `.opencode/agents/pinkman.md` to modify.
+Edit `.opencode/agents/snoopy.md` to modify.

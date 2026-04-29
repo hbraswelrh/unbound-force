@@ -1,6 +1,6 @@
-# Tasks: Pinkman OSS Scout
+# Tasks: Snoopy OSS Scout
 
-**Input**: Design documents from `specs/032-pinkman-oss-scout/`
+**Input**: Design documents from `specs/032-snoopy-oss-scout/`
 **Prerequisites**: plan.md (required), spec.md (required),
 research.md, data-model.md, contracts/agent-interface.md
 
@@ -10,7 +10,7 @@ verify output format). No TDD requested.
 
 **Organization**: Tasks are grouped by user story. All
 four modes (discover, trend, audit, report) are
-implemented within the single `pinkman.md` agent file
+implemented within the single `snoopy.md` agent file
 as instruction sections. The `/scout` command file
 routes to the agent.
 
@@ -25,10 +25,10 @@ routes to the agent.
 ## Phase 1: Setup
 
 **Purpose**: Create the foundational file structure for
-Pinkman agent and command.
+Snoopy agent and command.
 
-- [x] T001 Create the Pinkman agent file at
-  `.opencode/agents/pinkman.md` with YAML frontmatter
+- [x] T001 Create the Snoopy agent file at
+  `.opencode/agents/snoopy.md` with YAML frontmatter
   (description: "OSS Scout — discovers open source
   projects, classifies licenses against the OSI-approved
   list, and tracks industry trends", mode: subagent,
@@ -45,14 +45,14 @@ Pinkman agent and command.
 
 - [x] T002 Create the `/scout` slash command file at
   `.opencode/command/scout.md` with YAML frontmatter
-  (description: "Invoke Pinkman OSS Scout to discover,
+  (description: "Invoke Snoopy OSS Scout to discover,
   trend-scan, audit, or report on open source projects").
   Include mode routing instructions per
   contracts/agent-interface.md: default mode is
   `discover`, `--trend` flag routes to trend mode,
   `--audit` flag routes to audit mode (default manifest:
   `go.mod`), `--report` flag routes to report mode.
-  Command delegates to the `pinkman` agent with the
+  Command delegates to the `snoopy` agent with the
   parsed arguments. Per research.md R1.
 
 **Checkpoint**: Two empty-shell Markdown files exist.
@@ -72,7 +72,7 @@ integration, and report persistence.
 phase is complete.
 
 - [x] T003 Add H2 "OSI License Retrieval" section to
-  `.opencode/agents/pinkman.md`: Instructions to fetch
+  `.opencode/agents/snoopy.md`: Instructions to fetch
   the current OSI-approved license list from
   `https://opensource.org/licenses/` via `webfetch` at
   every invocation. Parse the page to extract SPDX
@@ -80,7 +80,7 @@ phase is complete.
   R2, FR-003.
 
 - [x] T004 Add H2 "Fallback License List" section to
-  `.opencode/agents/pinkman.md`: Define a hardcoded
+  `.opencode/agents/snoopy.md`: Define a hardcoded
   fallback set of well-known OSI-approved licenses (MIT,
   Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, MPL-2.0,
   LGPL-2.1, LGPL-3.0, GPL-2.0, GPL-3.0, AGPL-3.0,
@@ -92,7 +92,7 @@ phase is complete.
   research.md R2, FR-012.
 
 - [x] T005 Add H2 "License Classification" section to
-  `.opencode/agents/pinkman.md`: Instructions to classify
+  `.opencode/agents/snoopy.md`: Instructions to classify
   a project's license by: (1) detecting the license file
   in the repository via webfetch, (2) identifying the
   SPDX identifier, (3) checking against the retrieved
@@ -105,7 +105,7 @@ phase is complete.
   Per FR-002, FR-003, FR-011.
 
 - [x] T006 Add H2 "Output Formatting" section to
-  `.opencode/agents/pinkman.md`: Define the standard
+  `.opencode/agents/snoopy.md`: Define the standard
   output format for all modes per
   contracts/agent-interface.md. Include the Scouted
   Project display template (name, URL, license, language,
@@ -115,7 +115,7 @@ phase is complete.
   template. Per FR-010, data-model.md.
 
 - [x] T007 Add H2 "Error Handling" section to
-  `.opencode/agents/pinkman.md`: Define error handling
+  `.opencode/agents/snoopy.md`: Define error handling
   behavior per contracts/agent-interface.md Error
   Handling Contract table: OSI site unreachable (use
   fallback), GitHub rate-limited (report partial),
@@ -126,9 +126,9 @@ phase is complete.
   silently). Per FR-012.
 
 - [x] T008 Add H2 "Report Persistence" section to
-  `.opencode/agents/pinkman.md`: Instructions to save
+  `.opencode/agents/snoopy.md`: Instructions to save
   scouting reports as Markdown files with YAML
-  frontmatter at `.uf/pinkman/reports/` using the naming
+  frontmatter at `.uf/snoopy/reports/` using the naming
   convention `YYYY-MM-DDTHH-MM-SS-<sanitized-query>.md`.
   YAML frontmatter schema per data-model.md Scouting
   Report section (producer, version, timestamp, query,
@@ -137,13 +137,13 @@ phase is complete.
   contracts/agent-interface.md Persistence Contract.
 
 - [x] T009 Add H2 "Dewey Integration" section to
-  `.opencode/agents/pinkman.md`: Instructions for
+  `.opencode/agents/snoopy.md`: Instructions for
   optional Dewey integration per
   contracts/agent-interface.md Dewey Integration section.
   Before scouting, query `dewey_semantic_search` for
   past evaluations of the same domain or project URL.
   After scouting, store a condensed summary via
-  `dewey_store_learning` with tag "pinkman", category
+  `dewey_store_learning` with tag "snoopy", category
   "reference". Graceful degradation: if Dewey tools
   return errors, skip silently and proceed with local
   storage only. Per FR-013.
@@ -170,7 +170,7 @@ dependencies are highlighted with counts, (4) non-approved
 projects appear in a separate section.
 
 - [x] T010 [US1] Add H2 "Discover Mode" section to
-  `.opencode/agents/pinkman.md`: Instructions for the
+  `.opencode/agents/snoopy.md`: Instructions for the
   default discover mode. When invoked with a domain
   keyword: (1) use `webfetch` to search GitHub for
   repositories matching the keyword, (2) for each
@@ -182,7 +182,7 @@ projects appear in a separate section.
   FR-001, FR-002, research.md R3.
 
 - [x] T011 [US1] Add H2 "Dependency Listing" section to
-  `.opencode/agents/pinkman.md`: Instructions to list
+  `.opencode/agents/snoopy.md`: Instructions to list
   direct dependencies for each scouted project. For each
   compatible project: (1) detect the dependency manifest
   file (go.mod, package.json, Cargo.toml,
@@ -195,7 +195,7 @@ projects appear in a separate section.
   has_manifest to false. Per FR-014, research.md R4.
 
 - [x] T012 [US1] Add H2 "Dependency Overlap Detection"
-  section to `.opencode/agents/pinkman.md`: Instructions
+  section to `.opencode/agents/snoopy.md`: Instructions
   for post-processing dependency overlap. After all
   projects are scouted: (1) collect all dependency lists,
   (2) identify dependencies that appear in 2+ projects,
@@ -207,7 +207,7 @@ projects appear in a separate section.
   entity, plan.md D5.
 
 - [x] T013 [US1] Add H2 "Incompatible Projects Section"
-  to `.opencode/agents/pinkman.md`: Instructions to
+  to `.opencode/agents/snoopy.md`: Instructions to
   present non-OSI-approved projects in a separate
   "Incompatible Projects (for awareness)" section with
   the project name, URL, detected license, and an
@@ -236,7 +236,7 @@ indicators, (3) non-OSI-approved trending projects
 appear in a separate section.
 
 - [x] T014 [US2] Add H2 "Trend Mode" section to
-  `.opencode/agents/pinkman.md`: Instructions for trend
+  `.opencode/agents/snoopy.md`: Instructions for trend
   scanning. When invoked with `--trend <category>`:
   (1) use `webfetch` to search GitHub for repositories
   in the category sorted by recent activity, (2) for
@@ -252,7 +252,7 @@ appear in a separate section.
 
 - [x] T015 [US2] Add trend indicator display to the
   Output Formatting section in
-  `.opencode/agents/pinkman.md`: Extend the Scouted
+  `.opencode/agents/snoopy.md`: Extend the Scouted
   Project display template to include trend indicators
   (star growth ↑X% in 90d, releases in 6mo, active
   contributors in 90d). Add secondary indicators when
@@ -262,7 +262,7 @@ appear in a separate section.
   contributor_activity).
 
 - [x] T016 [US2] Add "no trends detected" handling to
-  Trend Mode section in `.opencode/agents/pinkman.md`:
+  Trend Mode section in `.opencode/agents/snoopy.md`:
   When no projects show significant trend signals in the
   requested category, report "no significant trends
   detected" with the date range consulted and sources
@@ -287,7 +287,7 @@ detected, (3) maintenance risk levels are assigned with
 specific indicators.
 
 - [x] T017 [US3] Add H2 "Audit Mode" section to
-  `.opencode/agents/pinkman.md`: Instructions for
+  `.opencode/agents/snoopy.md`: Instructions for
   dependency auditing. When invoked with
   `--audit [manifest-path]`: (1) read the local manifest
   file using the `read` tool (default: `go.mod`),
@@ -299,7 +299,7 @@ specific indicators.
   FR-006, research.md R4.
 
 - [x] T018 [US3] Add H2 "License Change Detection"
-  section to `.opencode/agents/pinkman.md`: Instructions
+  section to `.opencode/agents/snoopy.md`: Instructions
   to detect license changes between dependency versions.
   For each dependency with an available update: (1) fetch
   the license of the currently used version, (2) fetch
@@ -310,7 +310,7 @@ specific indicators.
   data-model.md Dependency Health Report entity.
 
 - [x] T019 [US3] Add H2 "Maintenance Risk Assessment"
-  section to `.opencode/agents/pinkman.md`: Instructions
+  section to `.opencode/agents/snoopy.md`: Instructions
   to assess maintenance health for each dependency.
   Check for: last commit date (healthy: <6mo, warning:
   6-12mo, critical: >12mo), archived repository status,
@@ -321,7 +321,7 @@ specific indicators.
   Risk Indicators list. Per FR-007.
 
 - [x] T020 [US3] Add audit output format to the Output
-  Formatting section in `.opencode/agents/pinkman.md`:
+  Formatting section in `.opencode/agents/snoopy.md`:
   Define the audit result table format per
   contracts/agent-interface.md Audit Result Table
   (columns: Dependency, Current, Latest, Update?,
@@ -345,11 +345,11 @@ project with all required sections.
 `/scout --report https://github.com/example/project`
 and verify: (1) report contains all sections (license,
 health, trends, deps, overlap, recommendation),
-(2) report is saved to `.uf/pinkman/reports/`,
+(2) report is saved to `.uf/snoopy/reports/`,
 (3) report includes YAML frontmatter with provenance.
 
 - [x] T021 [US4] Add H2 "Report Mode" section to
-  `.opencode/agents/pinkman.md`: Instructions for
+  `.opencode/agents/snoopy.md`: Instructions for
   generating adoption recommendation reports. When
   invoked with `--report <project-url>`: (1) use
   `webfetch` to fetch comprehensive project metadata
@@ -369,7 +369,7 @@ health, trends, deps, overlap, recommendation),
   entity.
 
 - [x] T022 [US4] Add report output format to the Output
-  Formatting section in `.opencode/agents/pinkman.md`:
+  Formatting section in `.opencode/agents/snoopy.md`:
   Define the full recommendation report format per
   contracts/agent-interface.md Recommendation Report
   template. Include YAML frontmatter with provenance
@@ -381,7 +381,7 @@ health, trends, deps, overlap, recommendation),
   Per FR-008, FR-010.
 
 - [x] T023 [US4] Add recommendation verdict logic to
-  Report Mode section in `.opencode/agents/pinkman.md`:
+  Report Mode section in `.opencode/agents/snoopy.md`:
   Define the decision criteria for each verdict: adopt
   (OSI-approved, healthy maintenance, positive trend,
   no conflicts), evaluate (OSI-approved but has concerns),
@@ -391,17 +391,17 @@ health, trends, deps, overlap, recommendation),
 
 **Checkpoint**: US4 is functional. `/scout --report`
 generates a comprehensive adoption recommendation saved
-to `.uf/pinkman/reports/`.
+to `.uf/snoopy/reports/`.
 
 ---
 
 ## Phase 7: Scaffold Integration & Tests
 
-**Purpose**: Embed Pinkman files in the scaffold engine,
+**Purpose**: Embed Snoopy files in the scaffold engine,
 update tests, and update documentation.
 
-- [x] T024 [P] Copy `.opencode/agents/pinkman.md` to
-  `internal/scaffold/assets/opencode/agents/pinkman.md`
+- [x] T024 [P] Copy `.opencode/agents/snoopy.md` to
+  `internal/scaffold/assets/opencode/agents/snoopy.md`
   as the embedded scaffold asset copy. Ensure exact
   byte-for-byte match with the canonical file. Per
   research.md R6.
@@ -414,7 +414,7 @@ update tests, and update documentation.
 
 - [x] T026 Update `expectedAssetPaths` in
   `internal/scaffold/scaffold_test.go`: add
-  `"opencode/agents/pinkman.md"` to the agents section
+  `"opencode/agents/snoopy.md"` to the agents section
   (alphabetically after `onboarding.md`) and
   `"opencode/command/scout.md"` to the commands section
   (alphabetically after `review-council.md`). Total
@@ -428,7 +428,7 @@ update tests, and update documentation.
 
 - [x] T028 Verify `isToolOwned` behavior in
   `internal/scaffold/scaffold.go`: confirm that
-  `pinkman.md` returns false (user-owned) and
+  `snoopy.md` returns false (user-owned) and
   `scout.md` returns true (tool-owned) based on
   existing classification logic. If the existing
   `isToolOwned` function does not correctly classify
@@ -449,23 +449,23 @@ update tests, and update documentation.
 **Purpose**: Documentation, AGENTS.md updates, and
 validation.
 
-- [x] T030 [P] Update AGENTS.md: add Pinkman to the
+- [x] T030 [P] Update AGENTS.md: add Snoopy to the
   "Utility Agents (Non-Hero)" table with columns: Agent
-  = "Pinkman", Role = "OSS project scouting and license
+  = "Snoopy", Role = "OSS project scouting and license
   compatibility", File =
-  `.opencode/agents/pinkman.md`, Status = "Implemented
+  `.opencode/agents/snoopy.md`, Status = "Implemented
   (Spec 032)". Add Spec 032 to the "Recent Changes"
   section with a summary of what was implemented. Update
-  the Project Structure section to include `pinkman.md`
+  the Project Structure section to include `snoopy.md`
   in the agents listing and `scout.md` in the commands
   listing. Update the `expectedAssetPaths` count in the
   Active Technologies section if referenced.
 
-- [x] T031 [P] Update `specs/032-pinkman-oss-scout/spec.md`:
+- [x] T031 [P] Update `specs/032-snoopy-oss-scout/spec.md`:
   change **Status** from "Draft" to "Complete".
 
 - [x] T032 Run the quickstart.md validation: invoke each
-  command from `specs/032-pinkman-oss-scout/quickstart.md`
+  command from `specs/032-snoopy-oss-scout/quickstart.md`
   (`/scout static analysis Go`, `/scout --trend MCP
   servers`, `/scout --audit`, `/scout --report <url>`)
   and verify each produces output matching the expected
@@ -474,7 +474,7 @@ validation.
 - [x] T033 Assess documentation impact per AGENTS.md
   Documentation Validation Gate. Determine whether a
   GitHub issue is needed in `unbound-force/website` for
-  the new `/scout` command and Pinkman agent. If user-
+  the new `/scout` command and Snoopy agent. If user-
   facing behavior is added (it is -- new slash command),
   create the issue with `gh issue create --repo
   unbound-force/website`.
@@ -520,7 +520,7 @@ validation.
 ### Within Each User Story
 
 All US tasks operate on the same file
-(`.opencode/agents/pinkman.md`), so they MUST be
+(`.opencode/agents/snoopy.md`), so they MUST be
 sequential within each story. However, stories add
 non-overlapping sections to the file, so different
 stories can be implemented sequentially without conflict.
@@ -540,7 +540,7 @@ stories can be implemented sequentially without conflict.
 
 ```text
 # Launch scaffold copies in parallel:
-Task: "Copy pinkman.md to internal/scaffold/assets/"
+Task: "Copy snoopy.md to internal/scaffold/assets/"
 Task: "Copy scout.md to internal/scaffold/assets/"
 
 # Then sequential:
@@ -575,7 +575,7 @@ Task: "Run tests"
 ### Single-File Advantage
 
 All four user stories add sections to a single agent
-file (`pinkman.md`). This means:
+file (`snoopy.md`). This means:
 - No merge conflicts between stories
 - Each story adds non-overlapping H2 sections
 - The file grows incrementally as stories are completed
@@ -588,7 +588,7 @@ file (`pinkman.md`). This means:
 
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story
-- All US tasks modify `.opencode/agents/pinkman.md`
+- All US tasks modify `.opencode/agents/snoopy.md`
   (single file) so they are sequential within a story
 - Total: 33 tasks across 8 phases
 - Commit after each phase completion

@@ -3,7 +3,7 @@
 ### Requirement: License Compatibility Tier
 
 After classifying a project's license as OSI-approved
-or not, Pinkman MUST assign a compatibility tier:
+or not, Snoopy MUST assign a compatibility tier:
 
 | Tier | Licenses |
 |------|----------|
@@ -14,30 +14,30 @@ or not, Pinkman MUST assign a compatibility tier:
 
 #### Scenario: Permissive license classified correctly
 - **GIVEN** a project with license `MIT`
-- **WHEN** Pinkman runs License Classification
+- **WHEN** Snoopy runs License Classification
 - **THEN** the compatibility tier MUST be `permissive`
 
 #### Scenario: Strong-copyleft license classified correctly
 - **GIVEN** a project with license `GPL-3.0-only`
-- **WHEN** Pinkman runs License Classification
+- **WHEN** Snoopy runs License Classification
 - **THEN** the compatibility tier MUST be
   `strong-copyleft`
 
 #### Scenario: Weak-copyleft license classified correctly
 - **GIVEN** a project with license `MPL-2.0`
-- **WHEN** Pinkman runs License Classification
+- **WHEN** Snoopy runs License Classification
 - **THEN** the compatibility tier MUST be
   `weak-copyleft`
 
 #### Scenario: Unrecognized license gets unknown tier
 - **GIVEN** a project with an OSI-approved license not
   in the tier table (e.g., a newly approved license)
-- **WHEN** Pinkman runs License Classification
+- **WHEN** Snoopy runs License Classification
 - **THEN** the compatibility tier MUST be `unknown`
 
 ### Requirement: Compatibility Verdict
 
-Pinkman MUST produce a compatibility verdict for each
+Snoopy MUST produce a compatibility verdict for each
 project based on its compatibility tier and the
 reference license (Apache-2.0):
 
@@ -57,36 +57,36 @@ the compatibility verdict MUST be `caution`.
 #### Scenario: Non-OSI license is incompatible
 - **GIVEN** a project with a non-OSI-approved license
   (e.g., SSPL-1.0)
-- **WHEN** Pinkman produces the compatibility verdict
+- **WHEN** Snoopy produces the compatibility verdict
 - **THEN** the verdict MUST be `incompatible`
 - **AND** the recommendation MUST be `avoid`
 
 #### Scenario: Non-standard license gets caution
 - **GIVEN** a project with a custom/non-standard
   license text
-- **WHEN** Pinkman produces the compatibility verdict
+- **WHEN** Snoopy produces the compatibility verdict
 - **THEN** the verdict MUST be `caution`
 - **AND** the recommendation MUST NOT exceed `evaluate`
 
 #### Scenario: Permissive license is compatible
 - **GIVEN** a project with license `Apache-2.0`
-- **WHEN** Pinkman produces the compatibility verdict
+- **WHEN** Snoopy produces the compatibility verdict
 - **THEN** the verdict MUST be `compatible`
 
 #### Scenario: GPL project is incompatible
 - **GIVEN** a project with license `GPL-3.0-only`
-- **WHEN** Pinkman produces the compatibility verdict
+- **WHEN** Snoopy produces the compatibility verdict
 - **THEN** the verdict MUST be `incompatible`
 
 #### Scenario: LGPL project gets caution
 - **GIVEN** a project with license `LGPL-3.0-only`
-- **WHEN** Pinkman produces the compatibility verdict
+- **WHEN** Snoopy produces the compatibility verdict
 - **THEN** the verdict MUST be `caution`
 
 ### Requirement: Dual-License Compatibility
 
 For dual-licensed projects (SPDX `OR` expression),
-Pinkman MUST evaluate each license option
+Snoopy MUST evaluate each license option
 independently and use the most favorable (least
 restrictive) compatibility tier.
 
@@ -99,14 +99,14 @@ are well-understood.
 
 #### Scenario: Dual-license with permissive option
 - **GIVEN** a project with license `MIT OR GPL-3.0-only`
-- **WHEN** Pinkman evaluates compatibility
+- **WHEN** Snoopy evaluates compatibility
 - **THEN** the compatibility tier MUST be `permissive`
   (from MIT)
 - **AND** the compatibility verdict MUST be `compatible`
 
 #### Scenario: Dual-license both copyleft
 - **GIVEN** a project with license `LGPL-3.0-only OR GPL-3.0-only`
-- **WHEN** Pinkman evaluates compatibility
+- **WHEN** Snoopy evaluates compatibility
 - **THEN** the compatibility tier MUST be
   `weak-copyleft` (from LGPL-3.0-only, more favorable)
 - **AND** the compatibility verdict MUST be `caution`
@@ -114,7 +114,7 @@ are well-understood.
 #### Scenario: Dual-license with unknown option
 - **GIVEN** a project with license
   `GPL-3.0-only OR FooBarLicense`
-- **WHEN** Pinkman evaluates compatibility
+- **WHEN** Snoopy evaluates compatibility
 - **THEN** the compatibility tier MUST be
   `strong-copyleft` (from GPL-3.0-only, more favorable
   than `unknown`)
@@ -125,7 +125,7 @@ are well-understood.
 
 Conjunctive license expressions (SPDX `AND`, e.g.,
 `Apache-2.0 AND GPL-3.0-only`) are out of scope for
-this change. When Pinkman encounters an `AND`
+this change. When Snoopy encounters an `AND`
 expression, it MUST classify the compatibility tier
 as `unknown` and produce a `caution` verdict. This is
 a conservative default that requires human legal
@@ -137,7 +137,7 @@ classification.
 #### Scenario: AND expression gets caution default
 - **GIVEN** a project with license
   `Apache-2.0 AND GPL-3.0-only`
-- **WHEN** Pinkman evaluates compatibility
+- **WHEN** Snoopy evaluates compatibility
 - **THEN** the compatibility tier MUST be `unknown`
 - **AND** the compatibility verdict MUST be `caution`
 - **AND** the recommendation MUST NOT exceed `evaluate`
@@ -146,7 +146,7 @@ classification.
 
 License exceptions (SPDX `WITH`, e.g.,
 `GPL-2.0-only WITH Classpath-exception-2.0`) are out
-of scope for this change. When Pinkman encounters a
+of scope for this change. When Snoopy encounters a
 `WITH` expression, it MUST classify the compatibility
 tier as `unknown` and produce a `caution` verdict.
 License exceptions can materially change copyleft
@@ -159,7 +159,7 @@ review.
 #### Scenario: WITH expression gets caution default
 - **GIVEN** a project with license
   `GPL-2.0-only WITH Classpath-exception-2.0`
-- **WHEN** Pinkman evaluates compatibility
+- **WHEN** Snoopy evaluates compatibility
 - **THEN** the compatibility tier MUST be `unknown`
 - **AND** the compatibility verdict MUST be `caution`
 - **AND** the recommendation MUST NOT exceed `evaluate`
@@ -179,7 +179,7 @@ the recommendation verdict:
 - **GIVEN** a project with license `GPL-3.0-only`,
   healthy maintenance, positive trend trajectory,
   and no dependency conflicts
-- **WHEN** Pinkman assigns the recommendation verdict
+- **WHEN** Snoopy assigns the recommendation verdict
 - **THEN** the verdict MUST be `avoid`
 - **AND** the reason MUST reference the license
   incompatibility with Apache-2.0
@@ -188,7 +188,7 @@ the recommendation verdict:
 - **GIVEN** a project with license `LGPL-3.0-only`,
   healthy maintenance, positive trend trajectory,
   and no dependency conflicts
-- **WHEN** Pinkman assigns the recommendation verdict
+- **WHEN** Snoopy assigns the recommendation verdict
 - **THEN** the verdict MUST NOT be `adopt`
 - **AND** the verdict MUST be `evaluate` at most
 - **AND** the reason MUST note the weak-copyleft
@@ -198,13 +198,13 @@ the recommendation verdict:
 - **GIVEN** a project with license `MIT`, healthy
   maintenance, positive trend trajectory, and no
   dependency conflicts
-- **WHEN** Pinkman assigns the recommendation verdict
+- **WHEN** Snoopy assigns the recommendation verdict
 - **THEN** the verdict MAY be `adopt`
   (compatibility does not block it)
 
 ### Requirement: Compatibility in Output Formats
 
-All Pinkman output formats MUST include the
+All Snoopy output formats MUST include the
 compatibility tier and verdict for each project:
 
 - **Discover/Trend Result List**: Add
@@ -217,7 +217,7 @@ compatibility tier and verdict for each project:
   in the License Analysis section.
 
 #### Scenario: Discover output shows compatibility
-- **GIVEN** Pinkman discovers a project with license
+- **GIVEN** Snoopy discovers a project with license
   `GPL-3.0-only`
 - **WHEN** the output is formatted
 - **THEN** the project entry MUST include
@@ -226,11 +226,11 @@ compatibility tier and verdict for each project:
 ### Requirement: Compatibility in Dewey Learnings
 
 The structured prose in Dewey learnings (per the
-Dewey Integration section in pinkman.md) MUST include
+Dewey Integration section in snoopy.md) MUST include
 the compatibility verdict for each project.
 
 #### Scenario: Dewey learning includes compatibility
-- **GIVEN** Pinkman discovers 3 projects with verdicts
+- **GIVEN** Snoopy discovers 3 projects with verdicts
   `compatible`, `caution`, and `incompatible`
 - **WHEN** the learning is stored via
   `dewey_store_learning`

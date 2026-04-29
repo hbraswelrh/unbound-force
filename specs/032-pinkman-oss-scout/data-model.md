@@ -1,10 +1,10 @@
-# Data Model: Pinkman OSS Scout
+# Data Model: Snoopy OSS Scout
 
 ## Entities
 
 ### Scouted Project
 
-An open source project discovered by Pinkman during a
+An open source project discovered by Snoopy during a
 scouting invocation.
 
 | Field                  | Type        | Description                                            |
@@ -51,7 +51,7 @@ scouting invocation.
 
 ### Compatibility Tier (Enum)
 
-Added by opsx/pinkman-license-compatibility.
+Added by opsx/snoopy-license-compatibility.
 
 | Value              | Description                                              |
 |--------------------|----------------------------------------------------------|
@@ -62,7 +62,7 @@ Added by opsx/pinkman-license-compatibility.
 
 ### Compatibility Verdict (Enum)
 
-Added by opsx/pinkman-license-compatibility.
+Added by opsx/snoopy-license-compatibility.
 
 | Value           | Description                                              |
 |-----------------|----------------------------------------------------------|
@@ -182,11 +182,11 @@ evaluation.
 ### Scouting Report (YAML Frontmatter Schema)
 
 The YAML frontmatter for reports stored at
-`.uf/pinkman/reports/`.
+`.uf/snoopy/reports/`.
 
 ```yaml
 ---
-producer: pinkman
+producer: snoopy
 version: "1.0.0"
 timestamp: "2026-04-22T14:30:00Z"
 query: "static analysis Go"

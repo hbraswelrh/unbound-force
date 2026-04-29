@@ -1,6 +1,6 @@
 ## Why
 
-Pinkman's License Classification procedure treats all
+Snoopy's License Classification procedure treats all
 OSI-approved licenses as equivalent. GPL-3.0 and MIT
 both receive an `approved` verdict, and a GPL-3.0
 project can receive an `adopt` recommendation if its
@@ -11,14 +11,14 @@ All hero repositories use Apache-2.0 (per Spec 002,
 section 2.2: "Apache 2.0 is RECOMMENDED for all hero
 repositories"). Adding a GPL-3.0 or AGPL-3.0
 dependency would create derivative work obligations
-that conflict with the Apache-2.0 license. Pinkman
+that conflict with the Apache-2.0 license. Snoopy
 should not recommend adopting dependencies whose
 licenses are incompatible with the project's own
 license.
 
 ## What Changes
 
-Add a license compatibility tier to Pinkman's License
+Add a license compatibility tier to Snoopy's License
 Classification procedure, layered on top of the
 existing OSI-approved check:
 
@@ -79,11 +79,11 @@ existing OSI-approved check:
 
 ## Impact
 
-- **Files affected**: `.opencode/agents/pinkman.md` and
+- **Files affected**: `.opencode/agents/snoopy.md` and
   its scaffold copy at
-  `internal/scaffold/assets/opencode/agents/pinkman.md`.
+  `internal/scaffold/assets/opencode/agents/snoopy.md`.
 - **No hero agent modifications**: No hero agent files
-  are changed. Heroes that consume Pinkman's Dewey
+  are changed. Heroes that consume Snoopy's Dewey
   learnings will see richer data (compatibility
   verdicts) through their existing `dewey_semantic_search`
   Step 0 queries.
@@ -110,8 +110,8 @@ Assessed against the Unbound Force org constitution.
 
 **Assessment**: PASS
 
-Pinkman is a non-hero utility agent. The compatibility
-tier enriches Pinkman's self-describing output (Markdown
+Snoopy is a non-hero utility agent. The compatibility
+tier enriches Snoopy's self-describing output (Markdown
 reports with YAML frontmatter, Dewey learnings with
 structured prose). No inter-hero communication channel
 is added or modified. Heroes discover compatibility
@@ -123,8 +123,8 @@ Step 0 queries.
 **Assessment**: PASS
 
 No hero is modified. No new dependency introduced. If
-Pinkman is not installed, no hero is affected. The
-compatibility tier is internal to Pinkman's
+Snoopy is not installed, no hero is affected. The
+compatibility tier is internal to Snoopy's
 classification logic.
 
 ### III. Observable Quality

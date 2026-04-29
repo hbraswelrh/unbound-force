@@ -30,7 +30,7 @@ func TestRunInit_FreshDir(t *testing.T) {
 	}
 
 	// Verify the summary includes a non-trivial file count
-	// 37 = 34 prior + 2 Pinkman files (Spec 032: pinkman.md agent + scout.md command) + 1 review-pr.md command
+	// 37 = 34 prior + 2 Snoopy files (Spec 032: snoopy.md agent + scout.md command) + 1 review-pr.md command
 	if !strings.Contains(output, "37 files processed") {
 		t.Errorf("expected '37 files processed' in output, got:\n%s", output)
 	}

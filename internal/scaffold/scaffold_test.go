@@ -132,11 +132,11 @@ var expectedAssetPaths = []string{
 	"opencode/command/scout.md",
 	"opencode/command/uf-init.md",
 	"opencode/command/unleash.md",
-	// OpenCode agents — Divisor personas (6) + Cobalt-Crush (1) + Mx F coach (1) + constitution-check (1) + pinkman (1)
+	// OpenCode agents — Divisor personas (6) + Cobalt-Crush (1) + Mx F coach (1) + constitution-check (1) + snoopy (1)
 	"opencode/agents/cobalt-crush-dev.md",
 	"opencode/agents/constitution-check.md",
 	"opencode/agents/mx-f-coach.md", // Spec 007: Mx F coaching persona (user-owned, not in --divisor subset, not tool-owned)
-	"opencode/agents/pinkman.md",     // Spec 032: Pinkman OSS Scout (user-owned)
+	"opencode/agents/snoopy.md",      // Spec 032: Snoopy OSS Scout (user-owned)
 	"opencode/agents/divisor-adversary.md",
 	"opencode/agents/divisor-architect.md",
 	"opencode/agents/divisor-curator.md",
@@ -565,8 +565,8 @@ func TestIsToolOwned(t *testing.T) {
 		{"opencode/agents/divisor-guard.md", false},
 		{"opencode/agents/divisor-architect.md", false},
 		{"opencode/agents/cobalt-crush-dev.md", false},
-		// User-owned: Pinkman agent (Spec 032)
-		{"opencode/agents/pinkman.md", false},
+		// User-owned: Snoopy agent (Spec 032)
+		{"opencode/agents/snoopy.md", false},
 		// Tool-owned: scout command (Spec 032)
 		{"opencode/command/scout.md", true},
 		// User-owned: other
@@ -1672,6 +1672,53 @@ func TestScaffoldOutput_NoOldPathReferences(t *testing.T) {
 		for _, pattern := range stalePatterns {
 			if strings.Contains(text, pattern) {
 				t.Errorf("scaffolded file %s contains stale %q reference (Spec 025 violation)", relPath, pattern)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk error: %v", err)
+	}
+}
+
+// TestScaffoldOutput_NoPinkmanReferences is a regression guard
+// for the Pinkman-to-Snoopy rename: scaffolded files must not
+// contain any stale "pinkman" identity references.
+func TestScaffoldOutput_NoPinkmanReferences(t *testing.T) {
+	dir := t.TempDir()
+	var buf bytes.Buffer
+
+	_, err := Run(Options{
+		TargetDir: dir,
+		Version:   "1.0.0-test",
+		Stdout:    &buf,
+	})
+	if err != nil {
+		t.Fatalf("Run() error: %v", err)
+	}
+
+	// Stale patterns that must NOT appear in scaffolded output.
+	stalePatterns := []string{
+		"pinkman",
+		"Pinkman",
+	}
+
+	// Walk all generated files and search for stale patterns.
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil || info.IsDir() {
+			return walkErr
+		}
+		content, readErr := os.ReadFile(path)
+		if readErr != nil {
+			t.Errorf("read %s: %v", path, readErr)
+			return nil
+		}
+		text := string(content)
+		relPath, _ := filepath.Rel(dir, path)
+
+		for _, pattern := range stalePatterns {
+			if strings.Contains(text, pattern) {
+				t.Errorf("scaffolded file %s contains stale %q reference (Pinkman rename violation)", relPath, pattern)
 			}
 		}
 		return nil

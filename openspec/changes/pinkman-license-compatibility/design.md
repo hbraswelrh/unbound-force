@@ -1,11 +1,11 @@
 ## Context
 
-Pinkman (Spec 032) classifies licenses as OSI-approved
+Snoopy (Spec 032) classifies licenses as OSI-approved
 or not, but does not distinguish permissive from copyleft
 licenses. The Unbound Force ecosystem uses Apache-2.0
 (Spec 002, section 2.2). Adding a copyleft dependency
 (GPL-3.0, AGPL-3.0) would impose derivative work
-obligations incompatible with Apache-2.0. Pinkman
+obligations incompatible with Apache-2.0. Snoopy
 currently gives `adopt` to any project with an
 OSI-approved license and healthy signals, creating a
 real risk of recommending incompatible dependencies.
@@ -18,7 +18,7 @@ modified.
 ## Goals / Non-Goals
 
 ### Goals
-- Prevent Pinkman from recommending `adopt` for
+- Prevent Snoopy from recommending `adopt` for
   dependencies whose licenses conflict with Apache-2.0.
 - Classify every detected license into a compatibility
   tier (permissive, weak-copyleft, strong-copyleft)
@@ -30,7 +30,7 @@ modified.
   output formats and Dewey learnings.
 
 ### Non-Goals
-- Legal advice. Pinkman's classification is a screening
+- Legal advice. Snoopy's classification is a screening
   tool, not a legal opinion. The `caution` verdict
   explicitly directs users to seek legal review.
 - License compatibility analysis between dependencies
@@ -150,7 +150,7 @@ Compatibility tiering must work in fallback mode.
 The reference license (Apache-2.0) is hardcoded in
 the agent file, not read from `LICENSE` at runtime.
 
-**Rationale**: Pinkman has `bash: false` and cannot
+**Rationale**: Snoopy has `bash: false` and cannot
 execute shell commands to detect the project license.
 It could use the `read` tool to parse `LICENSE`, but
 Spec 002 already establishes Apache-2.0 as the
@@ -170,7 +170,7 @@ Weak-copyleft licenses (LGPL, MPL-2.0) have nuanced
 compatibility depending on usage patterns (static vs
 dynamic linking, file-level copyleft boundary). The
 blanket `caution` verdict does not distinguish these
-subtleties. This is accepted because Pinkman is a
+subtleties. This is accepted because Snoopy is a
 screening tool, not a legal advisor — `caution` means
 "get human input," which is the correct response to
 nuanced legal questions.

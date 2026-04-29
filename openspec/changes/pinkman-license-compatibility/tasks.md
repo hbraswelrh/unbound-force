@@ -1,6 +1,6 @@
 ## 1. Add Compatibility Tier Classification
 
-- [x] 1.1 In `.opencode/agents/pinkman.md`, add a
+- [x] 1.1 In `.opencode/agents/snoopy.md`, add a
   "License Compatibility" section after "License
   Classification". Define the three-tier mapping table
   (permissive, weak-copyleft, strong-copyleft) with all
@@ -62,7 +62,7 @@
 ## 6. Synchronize Scaffold Copy
 
 - [x] 6.1 Synchronize the scaffold asset copy at
-  `internal/scaffold/assets/opencode/agents/pinkman.md`
+  `internal/scaffold/assets/opencode/agents/snoopy.md`
   with the updated live agent file.
 
 ## 7. Verify Scaffold Drift Detection
@@ -88,7 +88,7 @@
 ## 9. Documentation Impact Assessment
 
 - [x] 9.1 Update AGENTS.md "Recent Changes" section
-  with a summary of the pinkman-license-compatibility
+  with a summary of the snoopy-license-compatibility
   change.
 - [x] 9.2 Verify no other documentation files require
   updates. Website documentation gate: exempt —

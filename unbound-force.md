@@ -154,12 +154,12 @@ By being the "Flow Facilitator and Continuous Improvement Coach," Mx F ensures t
 
 Utility agents are not heroes — they do not produce artifacts or participate in the hero lifecycle workflow. They provide specialized capabilities that support the heroes and the human engineer.
 
-### OSS Scout: Pinkman
+### OSS Scout: Snoopy
 
 **Focus:** *Open Source Discovery, License Compatibility, and Industry Trend Tracking*
 
-Pinkman scouts the open source landscape so the team adopts the right tools early, with full supply chain visibility. It discovers license-compatible projects, tracks industry trends, audits dependency health, and produces structured adoption recommendations — all without overlapping any hero's responsibilities.
+Snoopy scouts the open source landscape so the team adopts the right tools early, with full supply chain visibility. It discovers license-compatible projects, tracks industry trends, audits dependency health, and produces structured adoption recommendations — all without overlapping any hero's responsibilities.
 
-Pinkman operates in four modes: **discover** (search for projects by keyword), **trend** (track trending projects in a category), **audit** (check existing dependencies for updates and license changes), and **report** (generate a full adoption recommendation for a specific project). Every scouted project is classified against the OSI-approved license list and assessed for compatibility with the ecosystem's Apache-2.0 license. Non-permissive licenses require explicit human approval before inclusion in results.
+Snoopy operates in four modes: **discover** (search for projects by keyword), **trend** (track trending projects in a category), **audit** (check existing dependencies for updates and license changes), and **report** (generate a full adoption recommendation for a specific project). Every scouted project is classified against the OSI-approved license list and assessed for compatibility with the ecosystem's Apache-2.0 license. Non-permissive licenses require explicit human approval before inclusion in results.
 
-Pinkman feeds upstream into the hero pipeline: Pinkman scouts, Muti-Mind prioritizes, Cobalt-Crush integrates, Gaze tests, The Divisor reviews, and Mx F coaches. Invoked via `/scout`.
+Snoopy feeds upstream into the hero pipeline: Snoopy scouts, Muti-Mind prioritizes, Cobalt-Crush integrates, Gaze tests, The Divisor reviews, and Mx F coaches. Invoked via `/scout`.

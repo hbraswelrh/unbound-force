@@ -1,13 +1,13 @@
-# Research: Pinkman OSS Scout
+# Research: Snoopy OSS Scout
 
 ## R1: Implementation Approach -- Agent-Only vs Go CLI
 
-**Decision**: Implement Pinkman as an OpenCode agent file
-(`.opencode/agents/pinkman.md`) with a `/scout` slash
+**Decision**: Implement Snoopy as an OpenCode agent file
+(`.opencode/agents/snoopy.md`) with a `/scout` slash
 command (`.opencode/command/scout.md`). No Go CLI backend
 package.
 
-**Rationale**: Pinkman's core operations are AI reasoning
+**Rationale**: Snoopy's core operations are AI reasoning
 tasks -- interpreting web content, classifying licenses,
 assessing trend signals, generating natural-language
 reports. These map naturally to the agent runtime's
@@ -17,7 +17,7 @@ for manifest parsing and report persistence. This keeps
 the implementation to 2 Markdown files (plus scaffold
 copies and test updates), which is dramatically simpler
 than a Go CLI backend (which would require a new
-`internal/pinkman/` package, Cobra commands, etc.).
+`internal/snoopy/` package, Cobra commands, etc.).
 
 Prior art: The onboarding agent (Spec 031) follows this
 exact pattern -- agent file + command, no Go backend.
@@ -26,7 +26,7 @@ are also agent-only implementations.
 
 **Alternatives considered**:
 - Go CLI backend (like Muti-Mind or Mx F): Adds 500+
-  lines of Go code, a new `cmd/pinkman/` entry point,
+  lines of Go code, a new `cmd/snoopy/` entry point,
   GoReleaser multi-binary config, and Homebrew formula.
   Unjustified complexity for operations that are better
   expressed as agent instructions.
@@ -34,7 +34,7 @@ are also agent-only implementations.
   full hero status (Spec 002 compliance), its own
   constitution, and CI pipeline. Overkill for a utility
   agent.
-- MCP server: Pinkman does not serve other tools; it is
+- MCP server: Snoopy does not serve other tools; it is
   invoked by users. An MCP server would be the wrong
   interaction model.
 
@@ -135,7 +135,7 @@ appears at different versions.
 
 **Alternatives considered**:
 - Shell out to `go list -m all`: Requires Go toolchain
-  and the target project's source code. Pinkman operates
+  and the target project's source code. Snoopy operates
   on remote projects, not local ones (except for the
   audit mode).
 - Dedicated Go parser package: Requires Go code in a
@@ -145,7 +145,7 @@ appears at different versions.
 ## R5: Report Format and Storage
 
 **Decision**: Store scouting reports as Markdown files
-with YAML frontmatter at `.uf/pinkman/reports/`. File
+with YAML frontmatter at `.uf/snoopy/reports/`. File
 naming: `YYYY-MM-DDTHH-MM-SS-<sanitized-query>.md`.
 Optionally store in Dewey via `dewey_store_learning`.
 
@@ -157,12 +157,12 @@ provides machine-parseable metadata (producer, version,
 timestamp, query, result count). The Markdown body
 contains the human-readable report.
 
-The `.uf/pinkman/` directory follows Spec 025's
+The `.uf/snoopy/` directory follows Spec 025's
 convention for per-project runtime data. Reports are
 git-ignored (runtime data, not source artifacts).
 
 Dewey integration uses `dewey_store_learning` with tag
-`pinkman` for semantic search across past scouting
+`snoopy` for semantic search across past scouting
 results. This enables the agent to answer "have we
 evaluated this project before?" without re-scouting.
 
@@ -182,7 +182,7 @@ evaluated this project before?" without re-scouting.
 
 **Decision**: Add two new embedded assets to the scaffold
 engine:
-1. `opencode/agents/pinkman.md` — user-owned
+1. `opencode/agents/snoopy.md` — user-owned
 2. `opencode/command/scout.md` — tool-owned
 
 Update `expectedAssetPaths` in tests (35 → 37).
@@ -199,7 +199,7 @@ canonical. User ownership for the agent file allows
 scouting behavior customization.
 
 **Alternatives considered**:
-- External tool delegation (like `specify init`): Pinkman
+- External tool delegation (like `specify init`): Snoopy
   is part of the core ecosystem, not a third-party tool.
   Embedding is correct.
 - No scaffold integration: Users would have to manually

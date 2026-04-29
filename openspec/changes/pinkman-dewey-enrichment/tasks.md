@@ -1,10 +1,10 @@
-## 1. Update Pinkman Agent Dewey Integration
+## 1. Update Snoopy Agent Dewey Integration
 
-- [x] 1.1 In `.opencode/agents/pinkman.md`, replace the
+- [x] 1.1 In `.opencode/agents/snoopy.md`, replace the
   "After Scouting" subsection under "Dewey Integration"
   with the enriched tag taxonomy and content conventions.
-  Update the tag from flat `pinkman` to mode-specific
-  `pinkman-<mode>` (discover, trend, audit, report).
+  Update the tag from flat `snoopy` to mode-specific
+  `snoopy-<mode>` (discover, trend, audit, report).
   Add content prefix convention (scouting-report:,
   trend-report:, dependency-audit:, adoption-report:).
   Replace "2-3 sentence summary" with mode-specific
@@ -15,7 +15,7 @@
   Dewey reference (e.g., "Dewey: Store summary per
   Dewey Integration") to include the correct mode-specific
   tag and content prefix inline (e.g., "Dewey: Store per
-  Dewey Integration using tag `pinkman-discover` and
+  Dewey Integration using tag `snoopy-discover` and
   prefix `scouting-report:`"). Do not duplicate the full
   Dewey integration instructions — keep the centralized
   section as the authoritative reference.
@@ -23,7 +23,7 @@
 ## 2. Synchronize Scaffold Copy
 
 - [x] 2.1 Synchronize the scaffold asset copy at
-  `internal/scaffold/assets/opencode/agents/pinkman.md`
+  `internal/scaffold/assets/opencode/agents/snoopy.md`
   with the updated live agent file.
 
 ## 3. Verify Scaffold Drift Detection
@@ -45,14 +45,14 @@
   -- no ad-hoc exchange format).
 - [x] 4.3 Verify that the Output Formatting, Report
   Persistence, and Recommendation Report sections in
-  `pinkman.md` are unchanged — only the Dewey Integration
+  `snoopy.md` are unchanged — only the Dewey Integration
   section is modified (Observable Quality -- provenance
   metadata preserved).
 
 ## 5. Documentation Impact Assessment
 
 - [x] 5.1 Update AGENTS.md "Recent Changes" section with
-  a summary of the pinkman-dewey-enrichment change.
+  a summary of the snoopy-dewey-enrichment change.
 - [x] 5.2 Verify no other documentation files require
   updates (README.md, unbound-force.md are unlikely
   to need changes for a convention-only agent update).

@@ -2,15 +2,15 @@
 
 ### Requirement: Mode-Specific Tag Taxonomy
 
-Pinkman MUST use mode-specific tags when storing
+Snoopy MUST use mode-specific tags when storing
 learnings via `dewey_store_learning`:
 
 | Mode | Tag Value |
 |------|-----------|
-| Discover | `pinkman-discover` |
-| Trend | `pinkman-trend` |
-| Audit | `pinkman-audit` |
-| Report | `pinkman-report` |
+| Discover | `snoopy-discover` |
+| Trend | `snoopy-trend` |
+| Audit | `snoopy-audit` |
+| Report | `snoopy-report` |
 
 Tags use hyphen separation (not slash) because
 `dewey_store_learning` strips `/` from tag values.
@@ -24,44 +24,44 @@ on stored learnings and MUST NOT be relied upon for
 learning discovery.
 
 #### Scenario: Discover mode stores with mode-specific tag
-- **GIVEN** Pinkman completes a discover mode scouting
+- **GIVEN** Snoopy completes a discover mode scouting
   session
-- **WHEN** Pinkman stores the learning via
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
-- **THEN** the `tag` parameter MUST be `pinkman-discover`
+- **THEN** the `tag` parameter MUST be `snoopy-discover`
 
 #### Scenario: Trend mode stores with mode-specific tag
-- **GIVEN** Pinkman completes a trend mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes a trend mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
-- **THEN** the `tag` parameter MUST be `pinkman-trend`
+- **THEN** the `tag` parameter MUST be `snoopy-trend`
 
 #### Scenario: Audit mode stores with mode-specific tag
-- **GIVEN** Pinkman completes an audit mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes an audit mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
-- **THEN** the `tag` parameter MUST be `pinkman-audit`
+- **THEN** the `tag` parameter MUST be `snoopy-audit`
 
 #### Scenario: Report mode stores with mode-specific tag
-- **GIVEN** Pinkman completes a report mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes a report mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
-- **THEN** the `tag` parameter MUST be `pinkman-report`
+- **THEN** the `tag` parameter MUST be `snoopy-report`
 
 #### Scenario: Filtered search finds mode-specific learnings
-- **GIVEN** Pinkman has stored learnings with tags
-  `pinkman-discover`, `pinkman-audit`, and
-  `pinkman-report`
+- **GIVEN** Snoopy has stored learnings with tags
+  `snoopy-discover`, `snoopy-audit`, and
+  `snoopy-report`
 - **WHEN** a consumer calls
   `dewey_semantic_search_filtered(query: "...",
-  has_tag: "pinkman-audit")`
+  has_tag: "snoopy-audit")`
 - **THEN** only the audit-tagged learning MUST be
   returned
 
 #### Scenario: Semantic search finds all learnings
-- **GIVEN** Pinkman has stored learnings with tags
-  `pinkman-discover`, `pinkman-audit`, and
-  `pinkman-report`
+- **GIVEN** Snoopy has stored learnings with tags
+  `snoopy-discover`, `snoopy-audit`, and
+  `snoopy-report`
 - **WHEN** a consumer calls `dewey_semantic_search`
   with a query matching all three learnings' content
 - **THEN** all three learnings SHOULD be returned
@@ -69,7 +69,7 @@ learning discovery.
 
 ### Requirement: Content Prefix Convention
 
-Pinkman MUST prefix the `information` string with a
+Snoopy MUST prefix the `information` string with a
 mode-specific label:
 
 | Mode | Prefix |
@@ -80,36 +80,36 @@ mode-specific label:
 | Report | `adoption-report:` |
 
 #### Scenario: Discover learning has correct prefix
-- **GIVEN** Pinkman completes a discover mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes a discover mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
 - **THEN** the `information` string MUST begin with
   `scouting-report:`
 
 #### Scenario: Trend learning has correct prefix
-- **GIVEN** Pinkman completes a trend mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes a trend mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
 - **THEN** the `information` string MUST begin with
   `trend-report:`
 
 #### Scenario: Audit learning has correct prefix
-- **GIVEN** Pinkman completes an audit mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes an audit mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
 - **THEN** the `information` string MUST begin with
   `dependency-audit:`
 
 #### Scenario: Report learning has correct prefix
-- **GIVEN** Pinkman completes a report mode session
-- **WHEN** Pinkman stores the learning via
+- **GIVEN** Snoopy completes a report mode session
+- **WHEN** Snoopy stores the learning via
   `dewey_store_learning`
 - **THEN** the `information` string MUST begin with
   `adoption-report:`
 
 ### Requirement: Structured Prose Content
 
-Pinkman MUST include the following structured data in
+Snoopy MUST include the following structured data in
 stored learnings, based on the scouting mode:
 
 **Discover mode**: project names, license verdicts
@@ -128,17 +128,17 @@ license changes, risk levels (healthy/warning/critical).
 key risk factors, license classification.
 
 #### Scenario: Discover learning contains structured data
-- **GIVEN** Pinkman discovers 3 projects in discover mode
-- **WHEN** Pinkman stores the learning
+- **GIVEN** Snoopy discovers 3 projects in discover mode
+- **WHEN** Snoopy stores the learning
 - **THEN** the information string MUST include each
   project's name, license verdict, and the original query
 - **AND** the information string SHOULD include
   overlapping dependencies if any were detected
 
 #### Scenario: Audit learning contains risk levels
-- **GIVEN** Pinkman audits a go.mod with 2 critical-risk
+- **GIVEN** Snoopy audits a go.mod with 2 critical-risk
   dependencies
-- **WHEN** Pinkman stores the learning
+- **WHEN** Snoopy stores the learning
 - **THEN** the information string MUST include the risk
   level for each flagged dependency
 
@@ -157,7 +157,7 @@ tool interface is authoritative.
 ### Requirement: Dewey After Scouting (Spec 032)
 
 Previously: "Store a condensed summary via
-`dewey_store_learning`: tag: `pinkman`, category:
+`dewey_store_learning`: tag: `snoopy`, category:
 `reference`, information: A 2-3 sentence summary
 including project names, license verdicts, key metrics,
 and the query used."

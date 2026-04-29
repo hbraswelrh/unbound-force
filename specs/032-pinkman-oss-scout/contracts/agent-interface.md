@@ -1,9 +1,9 @@
-# Agent Interface Contract: Pinkman OSS Scout
+# Agent Interface Contract: Snoopy OSS Scout
 
 ## Invocation Interface
 
-Pinkman is invoked via the `/scout` slash command in
-OpenCode. The command file delegates to the `pinkman`
+Snoopy is invoked via the `/scout` slash command in
+OpenCode. The command file delegates to the `snoopy`
 agent.
 
 ### Command: `/scout`
@@ -94,7 +94,7 @@ recommendation document.
 
 ```markdown
 ---
-producer: pinkman
+producer: snoopy
 version: "1.0.0"
 timestamp: "<ISO-8601>"
 query: "<project-url>"
@@ -147,7 +147,7 @@ mode: "report"
 
 ### Local Storage
 
-Reports are written to `.uf/pinkman/reports/` with the
+Reports are written to `.uf/snoopy/reports/` with the
 naming convention:
 `YYYY-MM-DDTHH-MM-SS-<sanitized-query>.md`
 
@@ -159,10 +159,10 @@ When Dewey is available, the agent stores a structured
 summary of each scouting session via
 `dewey_store_learning` with mode-specific tags and
 content prefixes (updated by
-opsx/pinkman-dewey-enrichment):
+opsx/snoopy-dewey-enrichment):
 
-- **tag**: `pinkman-<mode>` (e.g., `pinkman-discover`,
-  `pinkman-trend`, `pinkman-audit`, `pinkman-report`).
+- **tag**: `snoopy-<mode>` (e.g., `snoopy-discover`,
+  `snoopy-trend`, `snoopy-audit`, `snoopy-report`).
   Hyphen-separated because `dewey_store_learning`
   strips `/` from tag values.
 - **category**: `reference`
