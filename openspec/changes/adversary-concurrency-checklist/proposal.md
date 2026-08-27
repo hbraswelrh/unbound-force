@@ -78,6 +78,7 @@ objective) on issue #469 (parent epic #465).
 - `.opencode/agents/divisor-adversary.md` (canonical source).
 - `internal/scaffold/assets/opencode/agents/divisor-adversary.md`
   (embedded scaffold mirror; kept byte-identical).
+- `CHANGELOG.md` (new entry under `## Unreleased` → `### Added`).
 
 ### Tests
 

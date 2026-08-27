@@ -51,10 +51,12 @@ now formalizes the already-verified change.
 
 - [ ] 4.1 Run `/uf.review-council` and resolve any
   REQUEST CHANGES before opening the PR
-- [ ] 4.2 File follow-up issue for reciprocal `divisor-sre.md`
-  Out of Scope row (deferred Option A)
+- [x] 4.2 File follow-up issue for reciprocal `divisor-sre.md`
+  Out of Scope row (deferred Option A) — already tracked by
+  existing issue #551
 - [ ] 4.3 File cross-repo website documentation issue for the
-  user-facing agent capability change
+  user-facing agent capability change — content prepared (see
+  council review); MUST be filed manually before PR merge
 
 <!-- spec-review: pending -->
 <!-- code-review: pending -->
