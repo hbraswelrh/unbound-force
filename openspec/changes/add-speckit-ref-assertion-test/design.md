@@ -136,20 +136,30 @@ block) rather than a naive whole-file `strings.Contains`. Dewey
 is satisfied by presence of `dewey_semantic_search` OR
 `dewey_search`.
 
-Block granularity (coordination with #549): the current Step 6
-"Spec-phase guardrails block" is a single labeled/fenced block
-covering multiple files, so per-file assertions are not yet
-extractable. #549 MUST restructure Step 6 so the required
-references are injected at a granularity the test can resolve
-per in-scope file — either (a) per-file labeled/fenced blocks,
-or (b) per-in-scope-command reference sub-blocks that carry the
-file name — so the "names the exact missing reference and the
-exact template file" failure output is satisfiable. The test
-author extracts by the label/fence #549 introduces; until #549
-lands, the extraction target for the newly-required Dewey and
-`/uf.review-council` references does not exist, which is the
-concrete driver of the red-first state. This block shape is
-best finalized jointly with #549's Step 6 edit.
+Block granularity (coordination with #549 — RESOLVED): the
+current Step 6 "Spec-phase guardrails block" is a single
+labeled/fenced block covering the three spec-phase in-scope
+files (specify, plan, tasks). During reconciliation, #549
+evaluated restructuring Step 6 into per-file labeled/fenced
+blocks and DECLINED it (#549 design D3 — "No per-file
+restructuring"): because the three spec-phase files are
+injected from ONE shared source block, per-file drift among
+them is architecturally impossible, so per-file blocks would
+add triplicated injected template prose in every downstream
+repo to guard against a non-existent failure mode (YAGNI).
+The test therefore keys the three spec-phase files to the
+shared "Spec-phase guardrails block" label. This satisfies the
+"names the exact template file" failure-output requirement
+(each subtest is keyed by filename) while honestly scoping the
+guarantee: the shared block gives precise failure NAMING, not
+independent per-file drift DETECTION among the three spec-phase
+files (see the test's scope-note comment). The concrete driver
+of the red-first state was that Step 6 carried none of the
+newly-required Dewey / `.specify/memory/constitution.md` /
+`/uf.review-council` references before #549's edit populated
+them. If Step 6 is ever restructured to inject the spec-phase
+files from distinct sources, split the table into per-file
+blocks at that time.
 
 **D4 — Required-reference matrix (per ADR-002).**
 Directly transcribed from the ADR-002 reference matrix:
