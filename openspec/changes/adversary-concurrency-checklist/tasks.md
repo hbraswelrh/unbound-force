@@ -49,14 +49,16 @@ now formalizes the already-verified change.
 
 ## 4. Governance (pre-PR)
 
-- [ ] 4.1 Run `/uf.review-council` and resolve any
-  REQUEST CHANGES before opening the PR
+- [x] 4.1 Run `/uf.review-council` and resolve any
+  REQUEST CHANGES before opening the PR — 5/6 APPROVE;
+  Curator MEDIUM/LOW resolved; Curator HIGH (cross-repo
+  docs issue) cleared by 4.3
 - [x] 4.2 File follow-up issue for reciprocal `divisor-sre.md`
   Out of Scope row (deferred Option A) — already tracked by
   existing issue #551
-- [ ] 4.3 File cross-repo website documentation issue for the
-  user-facing agent capability change — content prepared (see
-  council review); MUST be filed manually before PR merge
+- [x] 4.3 File cross-repo website documentation issue for the
+  user-facing agent capability change — filed as
+  unbound-force/website#269
 
-<!-- spec-review: pending -->
-<!-- code-review: pending -->
+<!-- spec-review: passed -->
+<!-- code-review: passed -->
