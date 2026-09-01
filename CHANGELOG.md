@@ -35,6 +35,18 @@ Each entry follows the format: `- <change-name>: <summary>`.
   `TestSpeckitTemplates_RequiredReferences`.
   (Spec: openspec/changes/reconcile-speckit-uf-refs/,
   Fixes: #549)
+- scaffold-agents-md-stale-refs: `uf init` stale command
+  reference detection now also scans the root `AGENTS.md`
+  file (in addition to `.opencode/agents/*.md`), so
+  references to pre-namespace command names in the
+  project's own AGENTS.md are surfaced. Matching is now
+  word-boundary anchored via `regexp`, so an
+  already-migrated reference (e.g. `/uf.review-council`)
+  is no longer falsely flagged as containing the stale
+  form (`/review-council`). Detection remains warn-only;
+  the user-owned `AGENTS.md` is never modified.
+  (Spec: openspec/changes/scaffold-agents-md-stale-refs/,
+  Fixes: #567)
 - pre-flight-file-scope-filter: Add Phase 2a file-scope
   filtering to skip tools that have zero in-scope files
   in the branch diff. Applies to all three execution

@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -353,14 +354,38 @@ func cleanupRenamedCommands(w io.Writer, targetDir string) []string {
 	return removed
 }
 
-// warnStaleCommandRefs scans agent files in .opencode/agents/
-// for references to old (pre-namespace-prefix) command names
-// and prints a warning listing affected files and replacements.
-// Agent files are user-owned and are not modified.
+// warnStaleCommandRefs scans project files for references to old
+// (pre-namespace-prefix) command names and prints a warning listing
+// affected files and replacements. The scan set includes the agent
+// files in .opencode/agents/*.md and the root AGENTS.md file.
+//
+// Matching is word-boundary anchored via regexp so that an
+// already-migrated reference (e.g. "/uf.review-council") is not
+// flagged as containing the stale form ("/review-council"). Only a
+// standalone stale reference not prefixed by "uf." is reported.
+//
+// This function is read-only: it never modifies AGENTS.md or any
+// agent file. Both agent files and root AGENTS.md are user-owned and
+// are not auto-updated.
 func warnStaleCommandRefs(w io.Writer, targetDir string) {
 	pattern := filepath.Join(targetDir, ".opencode", "agents", "*.md")
 	matches, err := filepath.Glob(pattern)
-	if err != nil || len(matches) == 0 {
+	if err != nil {
+		// Tolerate a glob error by treating it as zero matches; the
+		// root AGENTS.md scan below must still proceed.
+		matches = nil
+	}
+
+	// Build the combined scan set: agent glob matches plus the root
+	// AGENTS.md file. AGENTS.md is only appended when it exists, so a
+	// project without one does not produce a spurious read warning.
+	files := make([]string, 0, len(matches)+1)
+	files = append(files, matches...)
+	agentsMD := filepath.Join(targetDir, "AGENTS.md")
+	if _, statErr := os.Stat(agentsMD); statErr == nil {
+		files = append(files, agentsMD)
+	}
+	if len(files) == 0 {
 		return
 	}
 
@@ -373,6 +398,33 @@ func warnStaleCommandRefs(w io.Writer, targetDir string) {
 		refMap["/"+oldBase] = "/" + newBase
 	}
 
+	// Pre-compile one word-boundary-anchored regexp per stale ref,
+	// outside the per-file loop, for performance. Patterns are built
+	// from the fixed internal refMap (not user input), so MustCompile
+	// is safe.
+	//
+	// The leading guard "(^|[^.a-zA-Z0-9_-])" ensures the stale ref is
+	// at start-of-string or preceded by a non-command character. The
+	// "." in the excluded class is decisive: in "/uf.review-council"
+	// the character immediately before "/review-council" is ".", which
+	// is excluded, so the migrated form is NOT matched. The trailing
+	// guard "($|[^a-zA-Z0-9_-])" avoids false positives such as
+	// "/review-council-foo".
+	type refMatcher struct {
+		re     *regexp.Regexp
+		oldRef string
+		newRef string
+	}
+	matchers := make([]refMatcher, 0, len(refMap))
+	for oldRef, newRef := range refMap {
+		pat := "(^|[^.a-zA-Z0-9_-])" + regexp.QuoteMeta(oldRef) + "($|[^a-zA-Z0-9_-])"
+		matchers = append(matchers, refMatcher{
+			re:     regexp.MustCompile(pat),
+			oldRef: oldRef,
+			newRef: newRef,
+		})
+	}
+
 	type staleRef struct {
 		file   string
 		oldRef string
@@ -380,7 +432,7 @@ func warnStaleCommandRefs(w io.Writer, targetDir string) {
 	}
 	var found []staleRef
 
-	for _, m := range matches {
+	for _, m := range files {
 		data, readErr := os.ReadFile(m)
 		if readErr != nil {
 			_, _ = fmt.Fprintf(w, "  warning: could not read %s: %v\n", filepath.Base(m), readErr)
@@ -388,9 +440,9 @@ func warnStaleCommandRefs(w io.Writer, targetDir string) {
 		}
 		content := string(data)
 		base := filepath.Base(m)
-		for oldRef, newRef := range refMap {
-			if strings.Contains(content, oldRef) {
-				found = append(found, staleRef{file: base, oldRef: oldRef, newRef: newRef})
+		for _, mt := range matchers {
+			if mt.re.MatchString(content) {
+				found = append(found, staleRef{file: base, oldRef: mt.oldRef, newRef: mt.newRef})
 			}
 		}
 	}
@@ -400,13 +452,14 @@ func warnStaleCommandRefs(w io.Writer, targetDir string) {
 	}
 
 	_, _ = fmt.Fprintln(w)
-	_, _ = fmt.Fprintln(w, "⚠  Stale command references in agent files:")
+	_, _ = fmt.Fprintln(w, "⚠  Stale command references in project files:")
 	for _, f := range found {
 		_, _ = fmt.Fprintf(w, "    %s: %s → %s\n", f.file, f.oldRef, f.newRef)
 	}
-	_, _ = fmt.Fprintln(w, "  Agent files are user-owned and not auto-updated.")
-	_, _ = fmt.Fprintln(w, "  Update these references manually, or run `uf init --force` to")
-	_, _ = fmt.Fprintln(w, "  re-scaffold all agent files (this will overwrite customizations).")
+	_, _ = fmt.Fprintln(w, "  These files are user-owned and not auto-updated.")
+	_, _ = fmt.Fprintln(w, "  Update these references manually. `uf init --force` re-scaffolds")
+	_, _ = fmt.Fprintln(w, "  tool-owned files only; the root AGENTS.md is user-owned and must")
+	_, _ = fmt.Fprintln(w, "  be updated by hand.")
 }
 
 // isToolOwned returns true if the file is maintained by the

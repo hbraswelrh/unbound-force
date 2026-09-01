@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -7039,6 +7040,112 @@ func TestWarnStaleCommandRefs_NoAgentFiles(t *testing.T) {
 
 	if buf.Len() != 0 {
 		t.Errorf("expected no output when no agent dir exists, got: %s", buf.String())
+	}
+}
+
+func TestWarnStaleCommandRefs_StaleRefInRootAGENTSmd(t *testing.T) {
+	dir := t.TempDir()
+
+	// Write a root AGENTS.md containing a stale reference. No
+	// .opencode/agents/ dir is created, proving AGENTS.md is
+	// scanned even with zero agent files.
+	agentsPath := filepath.Join(dir, "AGENTS.md")
+	content := "See /review-council for the review workflow.\n"
+	if err := os.WriteFile(agentsPath, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+
+	var buf bytes.Buffer
+	warnStaleCommandRefs(&buf, dir)
+
+	output := buf.String()
+	if !strings.Contains(output, "Stale command references") {
+		t.Errorf("expected stale reference warning header, got: %s", output)
+	}
+	if !strings.Contains(output, "AGENTS.md") {
+		t.Errorf("expected AGENTS.md file name in warning, got: %s", output)
+	}
+	if !strings.Contains(output, "/review-council") {
+		t.Errorf("expected old ref /review-council in warning, got: %s", output)
+	}
+	if !strings.Contains(output, "/uf.review-council") {
+		t.Errorf("expected new ref /uf.review-council in warning, got: %s", output)
+	}
+
+	// Warn-only guarantee: AGENTS.md must be unmodified.
+	after, err := os.ReadFile(agentsPath)
+	if err != nil {
+		t.Fatalf("read back: %v", err)
+	}
+	if string(after) != content {
+		t.Errorf("expected AGENTS.md to be unmodified, got: %s", string(after))
+	}
+}
+
+func TestWarnStaleCommandRefs_MigratedRefInRootAGENTSmd(t *testing.T) {
+	dir := t.TempDir()
+
+	// Write a root AGENTS.md containing only the already-migrated
+	// reference. This is the decisive substring-safety guard proving
+	// /uf.review-council is not falsely flagged as containing
+	// /review-council. No .opencode/agents/ dir is created.
+	content := "See /uf.review-council for the review workflow.\n"
+	if err := os.WriteFile(filepath.Join(dir, "AGENTS.md"), []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+
+	var buf bytes.Buffer
+	warnStaleCommandRefs(&buf, dir)
+
+	if buf.Len() != 0 {
+		t.Errorf("expected no warning for migrated ref, got: %s", buf.String())
+	}
+}
+
+// TestWarnStaleCommandRefs_ProjectAGENTSmdHasNoStaleRefs is a
+// drift-detection test that reads THIS repo's own root AGENTS.md and
+// asserts that zero stale (pre-namespace-prefix) command references
+// remain. It iterates EVERY stale command name derived from the
+// unexported renamedCommands map (the single source of truth), rather
+// than hardcoding a subset such as /review-council. This catches drift
+// where a command is renamed but the repo's own AGENTS.md falls behind.
+//
+// Detection mirrors warnStaleCommandRefs exactly: stale ref strings are
+// derived the same way ("/" + base name without ".md"), and each ref is
+// matched with the same word-boundary-anchored pattern so that an
+// already-migrated reference (e.g. /uf.review-council) is not falsely
+// counted as containing its stale form (/review-council).
+func TestWarnStaleCommandRefs_ProjectAGENTSmdHasNoStaleRefs(t *testing.T) {
+	projectRoot := findProjectRoot(t)
+	if projectRoot == "" {
+		t.Skip("could not locate project root (no go.mod found)")
+	}
+
+	agentsPath := filepath.Join(projectRoot, "AGENTS.md")
+	if _, err := os.Stat(agentsPath); err != nil {
+		t.Skip("AGENTS.md not found at project root")
+	}
+
+	data, err := os.ReadFile(agentsPath)
+	if err != nil {
+		t.Fatalf("read AGENTS.md: %v", err)
+	}
+	content := string(data)
+
+	// Iterate every stale command name from renamedCommands, deriving
+	// the stale ref string the same way the production refMap does.
+	for oldRel, newRel := range renamedCommands {
+		staleRef := "/" + strings.TrimSuffix(filepath.Base(oldRel), ".md")
+		newRef := "/" + strings.TrimSuffix(filepath.Base(newRel), ".md")
+
+		// Same word-boundary-anchored pattern as warnStaleCommandRefs:
+		// the leading "." in the excluded class ensures the migrated
+		// form (e.g. /uf.review-council) is not flagged as a stale hit.
+		pat := "(^|[^.a-zA-Z0-9_-])" + regexp.QuoteMeta(staleRef) + "($|[^a-zA-Z0-9_-])"
+		re := regexp.MustCompile(pat)
+		if re.MatchString(content) {
+			t.Errorf("root AGENTS.md contains stale command reference %s (should be %s); the repo's own AGENTS.md has drifted behind a command rename", staleRef, newRef)
+		}
 	}
 }
 
