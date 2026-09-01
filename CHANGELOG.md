@@ -83,6 +83,16 @@ Each entry follows the format: `- <change-name>: <summary>`.
   `mustNotContain`). Regression gate anchored to ADR-002.
   (Spec: openspec/changes/add-speckit-ref-assertion-test/,
   Fixes: #548)
+- adversary-concurrency-checklist: Add "Concurrency Correctness"
+  section (5 items: goroutine leaks, deadlock/lock-ordering, unsafe
+  concurrent access, `context.Context` propagation, `sync.WaitGroup`
+  misuse) to `divisor-adversary.md`, scoped to production code. Adds
+  an Adversary/SRE Out of Scope boundary row (concurrency
+  correctness → The Adversary; concurrency efficiency → The SRE) and
+  scopes test-code concurrency to The Tester. Synced to the embedded
+  scaffold mirror.
+  (Spec: openspec/changes/adversary-concurrency-checklist/,
+  Fixes: #469)
 - scaffold-dcp-config: `uf init` now creates `.opencode/dcp.jsonc`
   with `protectTags: true`, enabling `<protect>` tag preservation
   during DCP context compression. Without this config, `<protect>`
