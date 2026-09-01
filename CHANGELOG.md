@@ -23,6 +23,18 @@ Each entry follows the format: `- <change-name>: <summary>`.
   Fixes: #479)
 
 ### Changed
+- reconcile-speckit-uf-refs: `uf init` Step 6 now injects
+  Dewey (`dewey_semantic_search`) and
+  `.specify/memory/constitution.md` references into the
+  spec-phase, implement, and constitution speckit guardrail
+  blocks, plus `/uf.review-council` into the implement block
+  only. Step 6 idempotency checks were tightened so
+  already-initialized repos re-running an upgraded binary
+  re-inject the new references (self-healing on upgrade)
+  instead of being skipped. Gated by
+  `TestSpeckitTemplates_RequiredReferences`.
+  (Spec: openspec/changes/reconcile-speckit-uf-refs/,
+  Fixes: #549)
 - pre-flight-file-scope-filter: Add Phase 2a file-scope
   filtering to skip tools that have zero in-scope files
   in the branch diff. Applies to all three execution
@@ -60,6 +72,17 @@ Each entry follows the format: `- <change-name>: <summary>`.
   Fixes: #428)
 
 ### Added
+- add-speckit-ref-assertion-test: Add red-first
+  content-assertion test `TestSpeckitTemplates_RequiredReferences`
+  (internal/scaffold) that verifies Step 6 of the embedded
+  `uf.init.md` injects the required Unbound Force references —
+  Dewey (`dewey_semantic_search`) and
+  `.specify/memory/constitution.md` for all five in-scope
+  speckit files, plus `/uf.review-council` for the implement
+  file only (implement-only boundary enforced via
+  `mustNotContain`). Regression gate anchored to ADR-002.
+  (Spec: openspec/changes/add-speckit-ref-assertion-test/,
+  Fixes: #548)
 - adversary-concurrency-checklist: Add "Concurrency Correctness"
   section (5 items: goroutine leaks, deadlock/lock-ordering, unsafe
   concurrent access, `context.Context` propagation, `sync.WaitGroup`

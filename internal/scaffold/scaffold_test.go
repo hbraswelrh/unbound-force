@@ -6691,6 +6691,188 @@ func TestGuardrailTemplates_CommandSpecificContent(t *testing.T) {
 	}
 }
 
+// TestSpeckitTemplates_RequiredReferences is a red-first regression
+// gate for issue #548, anchored to ADR-002
+// (docs/decisions/002-uf-refs-source-of-truth-layer.md, Option B:
+// extend Step 6 of uf.init.md as the authoritative injection layer).
+// It asserts that the Step 6 "Speckit Command Guardrails" injection
+// surface of the EMBEDDED canonical uf.init.md carries the required
+// Unbound Force references for each of the five in-scope upstream
+// speckit templates. Modeled on
+// TestGuardrailTemplates_CommandSpecificContent (issue #256 style):
+// read the embedded asset via assetContent, scope matching to the
+// Step 6 region and the per-file guardrail block, then apply
+// mustContain/mustNotContain via strings.Contains inside per-file
+// subtests so failures name the exact file and the exact reference.
+//
+// Required-reference matrix (ADR-002 / design D4):
+//
+//	| File                    | Dewey | constitution.md | /uf.review-council |
+//	|-------------------------|-------|-----------------|--------------------|
+//	| speckit.specify.md      | req   | req             | mustNotContain     |
+//	| speckit.plan.md         | req   | req             | mustNotContain     |
+//	| speckit.tasks.md        | req   | req             | mustNotContain     |
+//	| speckit.implement.md    | req   | req             | req (mustContain)  |
+//	| speckit.constitution.md | req   | req             | mustNotContain     |
+//
+// Dewey is satisfied by dewey_semantic_search OR dewey_search.
+//
+// Steady-state contract (regression gate): Step 6 of the embedded
+// uf.init.md MUST inject Dewey + constitution.md references for all
+// five in-scope files and /uf.review-council for the implement file
+// only; this test fails if any required reference is removed or the
+// implement-only boundary is breached.
+//
+// History: introduced red-first with the #548/#549 co-merge (design
+// D5) — the assertions were authored before the #549 reconciliation
+// edit populated Step 6, so on the pre-#549 tree they failed RED and
+// named the exact missing references. The #549 edit turns them green.
+//
+// Scope note: the three spec-phase in-scope files (specify, plan,
+// tasks) are injected from a SINGLE shared "Spec-phase guardrails
+// block" (design D3 — no per-file restructuring). Their subtests
+// therefore assert against the same block; the value of keying by
+// filename is precise failure output (naming the exact in-scope
+// file), NOT independent per-file drift detection among the three.
+// If Step 6 is ever restructured to inject the spec-phase files from
+// distinct sources, split this table into per-file blocks.
+func TestSpeckitTemplates_RequiredReferences(t *testing.T) {
+	content, err := assetContent("opencode/commands/uf.init.md")
+	if err != nil {
+		t.Fatalf("read embedded uf.init.md: %v", err)
+	}
+	text := string(content)
+
+	// Scope all matching to the Step 6 region so a reference that
+	// lives in Step 7 (the read-only verifier) or elsewhere cannot
+	// green-pass this test (design D3).
+	step6Start := strings.Index(text, "### Step 6:")
+	if step6Start < 0 {
+		t.Fatalf("Step 6 heading not found in embedded uf.init.md")
+	}
+	step7Start := strings.Index(text[step6Start:], "### Step 7:")
+	if step7Start < 0 {
+		t.Fatalf("Step 7 heading (Step 6 region end) not found in embedded uf.init.md")
+	}
+	step6Region := text[step6Start : step6Start+step7Start]
+
+	// extractBlock returns the content of the ```markdown ... ```
+	// fenced block that immediately follows the given bold label
+	// within the Step 6 region. It returns ("", false) when the
+	// label or its fence is absent. Absence is treated as a normal
+	// red condition (the reference cannot be present in a block that
+	// does not exist), NOT a fatal extraction bug, so the missing
+	// reference is reported per file rather than aborting the test.
+	//
+	// The label is matched in its bold markdown form ("**"+label+"**")
+	// so it binds to the actual block heading, NOT to a bare-substring
+	// occurrence of the same phrase in surrounding Step 6 instruction
+	// prose (e.g. the idempotency-correction text references the
+	// "Spec-phase guardrails block" by name). This keeps extraction
+	// deterministic regardless of instruction-prose edits.
+	extractBlock := func(label string) (string, bool) {
+		idx := strings.Index(step6Region, "**"+label+"**")
+		if idx < 0 {
+			return "", false
+		}
+		remainder := step6Region[idx:]
+		fenceStart := strings.Index(remainder, "```markdown")
+		if fenceStart < 0 {
+			return "", false
+		}
+		afterOpen := remainder[fenceStart+len("```markdown"):]
+		fenceEnd := strings.Index(afterOpen, "```")
+		if fenceEnd < 0 {
+			return "", false
+		}
+		return afterOpen[:fenceEnd], true
+	}
+
+	const (
+		deweySemantic  = "dewey_semantic_search"
+		deweyKeyword   = "dewey_search"
+		constitutionMd = ".specify/memory/constitution.md"
+		reviewCouncil  = "/uf.review-council"
+	)
+
+	// Per-in-scope-file mapping to the Step 6 block that injects
+	// that file's guardrail content. The three spec-phase in-scope
+	// files (specify, plan, tasks) share one block ("Spec-phase
+	// guardrails block") per design D3 (no per-file restructuring),
+	// so their subtests assert against identical bytes. Keying the
+	// table by filename is deliberate: it names the exact in-scope
+	// file in failure output. It does NOT provide independent drift
+	// detection between the three spec-phase files — they cannot
+	// diverge while injected from a single shared source block.
+	//
+	// blockLabel is the Step 6 label whose fenced block injects this
+	// file's references. requireReviewCouncil encodes the
+	// implement-only boundary (D4): true => mustContain, false =>
+	// mustNotContain for /uf.review-council.
+	type speckitFile struct {
+		file                 string
+		blockLabel           string
+		requireReviewCouncil bool
+	}
+
+	// Explicit enumeration of the five in-scope upstream files (D2 —
+	// NOT derived from a speckit.*.md glob). The four UF-custom
+	// commands (analyze, checklist, clarify, taskstoissues) and
+	// testreview are intentionally excluded.
+	inScope := []speckitFile{
+		{file: "speckit.specify.md", blockLabel: "Spec-phase guardrails block", requireReviewCouncil: false},
+		{file: "speckit.plan.md", blockLabel: "Spec-phase guardrails block", requireReviewCouncil: false},
+		{file: "speckit.tasks.md", blockLabel: "Spec-phase guardrails block", requireReviewCouncil: false},
+		{file: "speckit.implement.md", blockLabel: "Implement guardrails block", requireReviewCouncil: true},
+		{file: "speckit.constitution.md", blockLabel: "Constitution guardrails block", requireReviewCouncil: false},
+	}
+
+	for _, sf := range inScope {
+		t.Run(sf.file, func(t *testing.T) {
+			block, ok := extractBlock(sf.blockLabel)
+			if !ok {
+				// The injection block for this file's references does
+				// not exist in Step 6, so every required reference is
+				// necessarily missing. Report each missing reference
+				// against the exact file (red for the right reason).
+				reviewCouncilSuffix := ""
+				if sf.requireReviewCouncil {
+					reviewCouncilSuffix = ", " + reviewCouncil
+				}
+				t.Errorf("%s: Step 6 block %q not found — required references cannot be injected (missing: Dewey, %s%s)",
+					sf.file, sf.blockLabel, constitutionMd, reviewCouncilSuffix)
+				return
+			}
+
+			// Dewey: satisfied by dewey_semantic_search OR dewey_search.
+			if !strings.Contains(block, deweySemantic) && !strings.Contains(block, deweyKeyword) {
+				t.Errorf("%s: Step 6 block %q MUST reference Dewey (%s OR %s) but does not",
+					sf.file, sf.blockLabel, deweySemantic, deweyKeyword)
+			}
+
+			// Constitution awareness: required for all five in-scope files.
+			if !strings.Contains(block, constitutionMd) {
+				t.Errorf("%s: Step 6 block %q MUST reference %q but does not",
+					sf.file, sf.blockLabel, constitutionMd)
+			}
+
+			// /uf.review-council: mustContain for implement only,
+			// mustNotContain for the other four (implement-only boundary).
+			if sf.requireReviewCouncil {
+				if !strings.Contains(block, reviewCouncil) {
+					t.Errorf("%s: Step 6 block %q MUST reference %q (implement phase) but does not",
+						sf.file, sf.blockLabel, reviewCouncil)
+				}
+			} else {
+				if strings.Contains(block, reviewCouncil) {
+					t.Errorf("%s: Step 6 block %q MUST NOT reference %q (implement-only boundary leaked)",
+						sf.file, sf.blockLabel, reviewCouncil)
+				}
+			}
+		})
+	}
+}
+
 func TestCleanupRenamedCommands_HappyPath(t *testing.T) {
 	dir := t.TempDir()
 
